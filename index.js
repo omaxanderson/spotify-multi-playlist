@@ -20,48 +20,80 @@ f.register(fastifySession, {
 });
 
 f.addHook('preHandler', (req, res, next) => {
-   console.log('session', req.session);
-   req.session.user = { name: 'max' };
+   const { url } = req.raw;
+   if (url === '/playlists') {
+      if (!req.session.access_token) {
+         res.redirect('/login');
+         return;
+      }
+   }
    next();
 });
 
-f.get('/login', async (req, res) => {
-   // console.log(req.session);
-   // @TODO come back to this one to get sessions working correctly...
-   if (req.session.access_token) {
-      console.log('FUCK YEAH WE\'RE USING THE SESSION');
-      // try to just get the playlists here...
-      const playlists = await axios.get('https://api.spotify.com/v1/me/playlists?access_token=' + req.session.access_token);
-      // console.log('user', req.session.user);
-      // console.log('not attempting to authenticate');
-      res.send({ playlists: playlists.data });
+// check for session access token
+const isAuthed = (req, res, next) => {
+   if (!req.session.access_token) {
+      res.redirect('/login');
+   } else {
+      next();
+   }
+}
+
+f.get('/', async (req, res) => {
+   const { access_token } = req.session;
+   console.log('access_token', access_token);
+   if (!access_token) {
+      // watch out for redirect loop??
+      res.redirect('/login');
       return;
    }
+   res.send('home page');
+});
+
+f.get('/playlists', async (req, res) => {
+   const { access_token } = req.session;
+   const playlists = await axios.get(
+      `https://api.spotify.com/v1/me/playlists?limit=50&access_token=${access_token}`
+   );
+   res.send({ playlists: playlists.data.items.map(({ id, name }) => ({id, name}))});
+});
+
+f.get('/login', async (req, res) => {
+
+   if (req.session.access_token) {
+      res.redirect('/');
+      return;
+   }
+
+   if (req.session.refresh_token) {
+      // TODO work out the refresh token logic
+   }
+
    // need to authenticate
-   // console.log('need to authenticate');
    const scopes = 'user-read-private playlist-read-private user-read-email';
-   const redirect_uri = 'http://localhost:5001/good';
+   const redirect_uri = 'http://localhost:5001/authenticate';
    res.redirect('https://accounts.spotify.com/authorize?'
       + 'response_type=code'
       + `&client_id=${process.env.SPOTIFY_CLIENT_ID}`
       + `&scope=${encodeURIComponent(scopes)}`
       + `&redirect_uri=${encodeURIComponent(redirect_uri)}`);
-   res.send({ hello: 'world' });
 });
 
-f.get('/good', async (req, res) => {
+// The redirect route coming back from the spotify /authorize call
+// Should never be called directly
+// TODO see whether fastify can restrict who a call is coming from
+f.get('/authenticate', async (req, res) => {
    const {
       error,
       code,
       state,
    } = req.query;
    if (code) {
-      // console.log('sending refresh token request...');
-      // authenticated, request refresh token
+
       const data = {
          grant_type: 'authorization_code',
          code,
-         redirect_uri: 'http://localhost:5001/good',
+         redirect_uri: 'http://localhost:5001/authenticate',
          client_id: process.env.SPOTIFY_CLIENT_ID,
          client_secret: process.env.SPOTIFY_CLIENT_SECRET,
       };
@@ -74,9 +106,11 @@ f.get('/good', async (req, res) => {
          },
          data,
          transformRequest: [
+            // just puts the object into a url-encoded format
             data => Object.keys(data).map(key => `${key}=${data[key]}`).join('&'),
          ],
       });
+
       if (result.status === 200) {
          const {
             access_token,
@@ -87,18 +121,9 @@ f.get('/good', async (req, res) => {
 
          // fuck yeah we've got our shit
          req.session.access_token = access_token;
-         console.log('expires_in', expires_in);
+         req.session.refresh_token = refresh_token;
 
-         // console.log('access_token', access_token);
-         // console.log('refresh_token', refresh_token);
-         // console.log('expires_in', expires_in);
-         // console.log('scope', scope);
-
-         const playlists = await axios.get('https://api.spotify.com/v1/me/playlists?access_token=' + access_token);
-         // console.log('user', req.session.user);
-         res.send({
-            playlists: playlists.data.items.map(playlist => ({ id: playlist.id, name: playlist.name })),
-         });
+         res.redirect('/');
          return;
       }
    } else if (error) {
