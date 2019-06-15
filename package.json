@@ -5,17 +5,27 @@
    "main": "index.js",
    "scripts": {
       "start": "npx nodemon --exec babel-node index.js",
+      "webpack-dev-server": "npx webpack-dev-server",
+      "dev": "concurrently \"npm run webpack-dev-server\" \"npm start\"",
+      "build": "npx webpack",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "",
    "license": "ISC",
    "dependencies": {
       "axios": "^0.19.0",
+      "babel-loader": "^8.0.6",
       "fastify": "^2.5.0",
       "fastify-cookie": "^3.0.2",
       "fastify-session": "^3.0.0",
+      "pm2": "^3.5.1",
       "point-of-view": "^3.5.0",
-      "pug": "^2.0.3"
+      "pug": "^2.0.3",
+      "react": "^16.8.6",
+      "react-dom": "^16.8.6",
+      "webpack": "^4.34.0",
+      "webpack-cli": "^3.3.4",
+      "webpack-dev-server": "^3.7.1"
    },
    "devDependencies": {
       "@babel/core": "^7.4.5",
@@ -24,7 +34,10 @@
       "@babel/plugin-syntax-dynamic-import": "^7.2.0",
       "@babel/plugin-syntax-object-rest-spread": "^7.2.0",
       "@babel/preset-env": "^7.4.5",
+      "@babel/preset-es2015": "^7.0.0-beta.53",
+      "@babel/preset-react": "^7.0.0",
       "babel-plugin-dynamic-import-node": "^2.2.0",
+      "concurrently": "^4.1.0",
       "pino-pretty": "^3.1.0"
    }
 }
