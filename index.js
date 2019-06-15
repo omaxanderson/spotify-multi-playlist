@@ -1,8 +1,11 @@
 import fastify from 'fastify';
+import pov from 'point-of-view';
+import pug from 'pug';
 import { inspect } from 'util';
 import axios from 'axios';
 import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
+
 const f = fastify({
    logger: {
       prettyPrint: true,
@@ -18,6 +21,13 @@ f.register(fastifySession, {
    },
    resave: false,
    saveUninitialized: true,
+});
+
+f.register(pov, {
+   engine: {
+      pug
+   },
+   templates: 'views',
 });
 
 f.addHook('preHandler', (req, res, next) => {
@@ -39,6 +49,10 @@ const isAuthed = (req, res, next) => {
       next();
    }
 }
+
+f.get('/pug', (req, res) => {
+   res.view('test.pug');
+});
 
 f.get('/', async (req, res) => {
    const { access_token } = req.session;
@@ -73,22 +87,17 @@ f.get('/play/:context_uri/:deviceId', async (req, res) => {
       data: {
          context_uri
       },
-      /*
-      transformRequest: [
-         data => Object.keys(data).map(key => `${key}=${data[key]}`).join('&'),
-      ],
-      */
    });
 
 });
 
-f.get('/tracks/:playlistId', async (req, res) => {
+f.get('/playlists/:playlistId', async (req, res) => {
    const { access_token } = req.session;
    const { playlistId } = req.params;
    const tracks = await axios.get(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&access_token=${access_token}`
    );
-   res.send({ tracks: tracks.data });
+   res.send({ tracks: tracks.data.items.map(({track}) => ({name: track.name, uri: track.uri}) )});
 });
 
 f.get('/playlists', async (req, res) => {
