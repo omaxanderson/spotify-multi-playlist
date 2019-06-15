@@ -1,4 +1,5 @@
 import fastify from 'fastify';
+import { inspect } from 'util';
 import axios from 'axios';
 import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
@@ -41,7 +42,6 @@ const isAuthed = (req, res, next) => {
 
 f.get('/', async (req, res) => {
    const { access_token } = req.session;
-   console.log('access_token', access_token);
    if (!access_token) {
       // watch out for redirect loop??
       res.redirect('/login');
@@ -50,12 +50,54 @@ f.get('/', async (req, res) => {
    res.send('home page');
 });
 
+f.get('/devices', async (req, res) => {
+   const { access_token } = req.session;
+   const devices = await axios.get(
+      `https://api.spotify.com/v1/me/player/devices?access_token=${access_token}`
+   );
+   res.send({ devices: devices.data });
+});
+
+f.get('/play/:context_uri/:deviceId', async (req, res) => {
+   const { access_token } = req.session;
+   const { context_uri, deviceId } = req.params;
+   console.log('context_uri', context_uri);
+   console.log('deviceId', deviceId);
+   const request = await axios({
+      method: 'PUT',
+      url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+      headers: {
+         'Content-Type': 'application/json',
+         'Authorization': `Bearer ${access_token}`,
+      },
+      data: {
+         context_uri
+      },
+      /*
+      transformRequest: [
+         data => Object.keys(data).map(key => `${key}=${data[key]}`).join('&'),
+      ],
+      */
+   });
+
+});
+
+f.get('/tracks/:playlistId', async (req, res) => {
+   const { access_token } = req.session;
+   const { playlistId } = req.params;
+   const tracks = await axios.get(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&access_token=${access_token}`
+   );
+   res.send({ tracks: tracks.data });
+});
+
 f.get('/playlists', async (req, res) => {
    const { access_token } = req.session;
+   console.log(access_token);
    const playlists = await axios.get(
       `https://api.spotify.com/v1/me/playlists?limit=50&access_token=${access_token}`
    );
-   res.send({ playlists: playlists.data.items.map(({ id, name }) => ({id, name}))});
+   res.send({ playlists: playlists.data.items.map(({ id, name, uri }) => ({id, name, uri }))});
 });
 
 f.get('/login', async (req, res) => {
@@ -70,7 +112,13 @@ f.get('/login', async (req, res) => {
    }
 
    // need to authenticate
-   const scopes = 'user-read-private playlist-read-private user-read-email';
+   const scopes = [
+      'user-modify-playback-state',
+      'user-read-playback-state',
+      'user-read-private',
+      'playlist-read-private',
+      'user-read-email'
+   ].join(' ');
    const redirect_uri = 'http://localhost:5001/authenticate';
    res.redirect('https://accounts.spotify.com/authorize?'
       + 'response_type=code'
@@ -128,8 +176,6 @@ f.get('/authenticate', async (req, res) => {
       }
    } else if (error) {
       // log in failed
-      // console.log('log in failed:', error);
-      // console.log('state', state);
    }
    res.send({ msg: 'authenticated' });
 });
