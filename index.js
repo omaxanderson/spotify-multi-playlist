@@ -82,8 +82,9 @@ f.put('/play', async (req, res) => {
       `https://api.spotify.com/v1/playlists/${playlist.id}/tracks?access_token=${access_token}`,
    )));
    const results = await Promise.all(promises);
-   const uris = _.flatten(results.map(playlist => playlist.data.items.map(obj => ({ name: obj.track.name, uri: obj.track.uri }))));
-   console.log(uris);
+   // const uris = _.shuffle(_.flatten(results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)))));
+   const uris = results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)));
+   const holyLodashMethods = _.compact(_.flatten(_.zip(...uris.map(u => _.shuffle(u)))));
    const result = await axios({
       method: 'PUT',
       url: 'https://api.spotify.com/v1/me/player/play',
@@ -92,7 +93,7 @@ f.put('/play', async (req, res) => {
          'Authorization': `Bearer ${access_token}`,
       },
       data: {
-         uris: _.shuffle(uris.map(({uri}) => uri)),
+         uris: holyLodashMethods,
       },
    });
    res.send(200);
