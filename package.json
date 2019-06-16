@@ -4,9 +4,9 @@
    "description": "",
    "main": "index.js",
    "scripts": {
-      "start": "npx nodemon --exec babel-node index.js",
-      "webpack-dev-server": "npx webpack-dev-server",
-      "dev": "concurrently \"npm run webpack-dev-server\" \"npm start\"",
+      "server": "npx nodemon --exec babel-node index.js",
+      "client": "npx webpack-dev-server",
+      "start": "concurrently \"npm run server\" \"npm run client\"",
       "build": "npx webpack",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
@@ -38,6 +38,7 @@
       "@babel/preset-react": "^7.0.0",
       "babel-plugin-dynamic-import-node": "^2.2.0",
       "concurrently": "^4.1.0",
+      "nodemon": "^1.19.1",
       "pino-pretty": "^3.1.0"
    }
 }

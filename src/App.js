@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import T from './components/Test2';
 
 class App extends Component {
 
    render() {
-      return <div>Heres my app!</div>;
+      return <div><p>Hello</p><T /></div>;
    }
 }
 
-const root = document.getElementById('App');
-console.log('heyooooo');
 ReactDOM.render(<App />, document.getElementById('App'));

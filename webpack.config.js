@@ -4,7 +4,7 @@ const glob = require('glob');
 const entries = () => {
    let entries = {};
 
-   glob.sync('src/*').map(f => `./${f}`).forEach(f => {
+   glob.sync('src/*.js').map(f => `./${f}`).forEach(f => {
       const m = f.match(/\/([^\/]+)\.js$/);
       console.log(m);
       entries[m[1]] = [f];
