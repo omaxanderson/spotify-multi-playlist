@@ -13,7 +13,7 @@ class App extends Component {
    }
 
    async componentDidMount() {
-      const data = await fetch('/playlists', {
+      const data = await fetch('/playlists?getAll=true', {
          mode: 'no-cors',
       });
       const playlists = await data.json();

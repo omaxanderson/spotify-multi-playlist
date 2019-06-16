@@ -33,7 +33,13 @@ f.register(pov, {
 
 f.addHook('preHandler', (req, res, next) => {
    const { url } = req.raw;
-   if (url === '/playlists') {
+   if ([
+         '/playlists',
+         '/pug',
+         '/',
+         '/play',
+         '/devices',
+      ].includes(url.split('?')[0])) {
       if (!req.session.access_token) {
          res.redirect('/login');
          return;
@@ -129,11 +135,16 @@ f.get('/playlists/:playlistId', async (req, res) => {
 
 f.get('/playlists', async (req, res) => {
    const { access_token } = req.session;
+   const { getAll } = req.query;
    console.log(access_token);
-   const playlists = await axios.get(
-      `https://api.spotify.com/v1/me/playlists?limit=50&access_token=${access_token}`
-   );
-   res.send(playlists.data.items.map(({ id, name, uri }) => ({id, name, uri })));
+   const playlists = [];
+   let next = `https://api.spotify.com/v1/me/playlists?limit=50`;
+   do {
+      const result = await axios.get(`${next}&access_token=${access_token}`);
+      playlists.push(...result.data.items);
+      next = result.data.next;
+   } while (next && getAll);
+   res.send(playlists.map(({ id, name, uri }) => ({id, name, uri })));
 });
 
 f.get('/login', async (req, res) => {
