@@ -1,4 +1,5 @@
 import fastify from 'fastify';
+import _ from 'lodash';
 import pov from 'point-of-view';
 import pug from 'pug';
 import { inspect } from 'util';
@@ -72,6 +73,31 @@ f.get('/devices', async (req, res) => {
    res.send({ devices: devices.data });
 });
 
+f.put('/play', async (req, res) => {
+   const { access_token } = req.session;
+   const { body } = req;
+
+   // get the tracks from the relevant playlists
+   const promises = body.map(playlist => (axios.get(
+      `https://api.spotify.com/v1/playlists/${playlist.id}/tracks?access_token=${access_token}`,
+   )));
+   const results = await Promise.all(promises);
+   const uris = _.flatten(results.map(playlist => playlist.data.items.map(obj => ({ name: obj.track.name, uri: obj.track.uri }))));
+   console.log(uris);
+   const result = await axios({
+      method: 'PUT',
+      url: 'https://api.spotify.com/v1/me/player/play',
+      headers: {
+         'Content-Type': 'application/json',
+         'Authorization': `Bearer ${access_token}`,
+      },
+      data: {
+         uris: _.shuffle(uris.map(({uri}) => uri)),
+      },
+   });
+   res.send(200);
+});
+
 f.get('/play/:context_uri/:deviceId', async (req, res) => {
    const { access_token } = req.session;
    const { context_uri, deviceId } = req.params;
@@ -106,7 +132,7 @@ f.get('/playlists', async (req, res) => {
    const playlists = await axios.get(
       `https://api.spotify.com/v1/me/playlists?limit=50&access_token=${access_token}`
    );
-   res.send({ playlists: playlists.data.items.map(({ id, name, uri }) => ({id, name, uri }))});
+   res.send(playlists.data.items.map(({ id, name, uri }) => ({id, name, uri })));
 });
 
 f.get('/login', async (req, res) => {
@@ -180,6 +206,8 @@ f.get('/authenticate', async (req, res) => {
          req.session.access_token = access_token;
          req.session.refresh_token = refresh_token;
 
+         // TODO figure out how to redirect to previously requested enpoint
+         //    probably a session variable
          res.redirect('/');
          return;
       }

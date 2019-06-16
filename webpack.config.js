@@ -6,8 +6,7 @@ const entries = () => {
 
    glob.sync('src/*.js').map(f => `./${f}`).forEach(f => {
       const m = f.match(/\/([^\/]+)\.js$/);
-      console.log(m);
-      entries[m[1]] = [f];
+      entries[m[1]] = ['@babel/polyfill', f];
    });
 
    return entries;
@@ -36,7 +35,7 @@ module.exports = {
       ],
    },
    output: {
-      filename: '[name].js',
+      filename: '[name].bundle.js',
       path: path.resolve(__dirname, 'dist'),
    },
    node: {
