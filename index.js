@@ -1,6 +1,6 @@
 import fastify from 'fastify';
 import _ from 'lodash';
-import { authenticate } from './authenticate';
+import { authenticate, login } from './authenticate';
 import pov from 'point-of-view';
 import pug from 'pug';
 import { inspect } from 'util';
