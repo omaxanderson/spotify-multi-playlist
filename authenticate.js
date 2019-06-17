@@ -1,9 +1,6 @@
 import axios from 'axios';
 import fs from 'fs';
 
-const SPOTIFY_CLIENT_ID = fs.readFileSync('/run/secrets/spotify_client_id');
-const SPOTIFY_CLIENT_SECRET = fs.readFileSync('/run/secrets/spotify_client_secret');
-
 export const authenticate = async (req, res) => {
    const {
       error,
@@ -16,8 +13,8 @@ export const authenticate = async (req, res) => {
          grant_type: 'authorization_code',
          code,
          redirect_uri: 'http://localhost:5001/authenticate',
-         client_id: SPOTIFY_CLIENT_ID,
-         client_secret: SPOTIFY_CLIENT_SECRET,
+         client_id: process.env.SPOTIFY_CLIENT_ID,
+         client_secret: process.env.SPOTIFY_CLIENT_SECRET,
       };
 
       const result = await axios({
@@ -59,8 +56,8 @@ export const authenticate = async (req, res) => {
          grant_type: 'refresh_token',
          refresh_token: req.session.refresh_token,
          redirect_uri: 'http://localhost:5001/authenticate',
-         client_id: SPOTIFY_CLIENT_ID,
-         client_secret: SPOTIFY_CLIENT_SECRET,
+         client_id: process.env.SPOTIFY_CLIENT_ID,
+         client_secret: process.env.SPOTIFY_CLIENT_SECRET,
       };
       const result = await axios({
          method: 'POST',
@@ -110,7 +107,7 @@ export const login = async (req, res) => {
    const redirect_uri = 'http://localhost:5001/authenticate';
    res.redirect('https://accounts.spotify.com/authorize?'
       + 'response_type=code'
-      + `&client_id=${SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`
+      + `&client_id=${process.env.SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`
       + `&scope=${encodeURIComponent(scopes)}`
       + `&redirect_uri=${encodeURIComponent(redirect_uri)}`);
 };
