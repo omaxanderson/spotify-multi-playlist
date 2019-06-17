@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import _ from 'lodash';
+import { authenticate } from './authenticate';
 import pov from 'point-of-view';
 import pug from 'pug';
 import { inspect } from 'util';
@@ -33,13 +34,10 @@ f.register(pov, {
 
 f.addHook('preHandler', (req, res, next) => {
    const { url } = req.raw;
-   if ([
-         '/playlists',
-         '/pug',
-         '/',
-         '/play',
-         '/devices',
-      ].includes(url.split('?')[0])) {
+   if (![
+      '/login',
+      '/authenticate',
+   ].includes(url.split('?')[0])) {
       if (!req.session.access_token) {
          res.redirect('/login');
          return;
@@ -56,6 +54,11 @@ const isAuthed = (req, res, next) => {
       next();
    }
 }
+
+f.get('/refresh', async (req, res) => {
+   const result = await authenticate(req, res);
+   res.send(result);
+});
 
 f.get('/pug', (req, res) => {
    res.view('test.pug');
@@ -121,7 +124,6 @@ f.get('/play/:context_uri/:deviceId', async (req, res) => {
          context_uri
       },
    });
-
 });
 
 f.get('/playlists/:playlistId', async (req, res) => {
@@ -133,6 +135,11 @@ f.get('/playlists/:playlistId', async (req, res) => {
    res.send({ tracks: tracks.data.items.map(({track}) => ({name: track.name, uri: track.uri}) )});
 });
 
+f.get('/d', async (req, res) => {
+   req.session.access_token = 'invalid access token';
+   res.send({success: 'true'});
+});
+
 f.get('/playlists', async (req, res) => {
    const { access_token } = req.session;
    const { getAll } = req.query;
@@ -140,15 +147,37 @@ f.get('/playlists', async (req, res) => {
    const playlists = [];
    let next = `https://api.spotify.com/v1/me/playlists?limit=50`;
    do {
-      const result = await axios.get(`${next}&access_token=${access_token}`);
-      playlists.push(...result.data.items);
-      next = result.data.next;
+      try {
+         const result = await axios.get(`${next}&access_token=${access_token}`);
+         console.log('type', typeof result);
+         if (result.status !== 200) {
+
+         }
+
+         console.log(result);
+         playlists.push(...result.data.items);
+         next = result.data.next;
+      } catch (e) {
+         const { response } = e;
+         if ([400, 401].includes(response.status)) {
+            await authenticate(req, res);
+            res.code(response.status).send({
+               status: response.status,
+               message: "Session expired, please refresh the page",
+            });
+            return;
+         }
+      }
    } while (next && getAll);
+
+   // TODO add metadata to the response
+   //    Also going to need to update the client logic to account for change from [] to {}
    res.send(playlists.map(({ id, name, uri }) => ({id, name, uri })));
 });
 
-f.get('/login', async (req, res) => {
-
+f.get('/fjdsafdsa', (req, res) => res.send('hello'));
+f.get('/login', async (req, res) => login(req, res));
+/*{
    if (req.session.access_token) {
       res.redirect('/');
       return;
@@ -166,6 +195,7 @@ f.get('/login', async (req, res) => {
       'playlist-read-private',
       'user-read-email'
    ].join(' ');
+
    const redirect_uri = 'http://localhost:5001/authenticate';
    res.redirect('https://accounts.spotify.com/authorize?'
       + 'response_type=code'
@@ -173,63 +203,14 @@ f.get('/login', async (req, res) => {
       + `&scope=${encodeURIComponent(scopes)}`
       + `&redirect_uri=${encodeURIComponent(redirect_uri)}`);
 });
+*/
 
 // The redirect route coming back from the spotify /authorize call
 // Should never be called directly
 // TODO see whether fastify can restrict who a call is coming from
-f.get('/authenticate', async (req, res) => {
-   const {
-      error,
-      code,
-      state,
-   } = req.query;
-   if (code) {
+f.get('/authenticate', async (req, res) => authenticate(req, res));
 
-      const data = {
-         grant_type: 'authorization_code',
-         code,
-         redirect_uri: 'http://localhost:5001/authenticate',
-         client_id: process.env.SPOTIFY_CLIENT_ID,
-         client_secret: process.env.SPOTIFY_CLIENT_SECRET,
-      };
-
-      const result = await axios({
-         method: 'POST',
-         url: 'https://accounts.spotify.com/api/token',
-         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-         },
-         data,
-         transformRequest: [
-            // just puts the object into a url-encoded format
-            data => Object.keys(data).map(key => `${key}=${data[key]}`).join('&'),
-         ],
-      });
-
-      if (result.status === 200) {
-         const {
-            access_token,
-            refresh_token,
-            expires_in,
-            scope,
-         } = result.data;
-
-         // fuck yeah we've got our shit
-         req.session.access_token = access_token;
-         req.session.refresh_token = refresh_token;
-
-         // TODO figure out how to redirect to previously requested enpoint
-         //    probably a session variable
-         res.redirect('/');
-         return;
-      }
-   } else if (error) {
-      // log in failed
-   }
-   res.send({ msg: 'authenticated' });
-});
-
-f.listen(5001, (err, addr) => {
+f.listen(5001, '0.0.0.0', (err, addr) => {
    if (err) throw err;
    f.log.info(`server listening on ${addr}`);
 });

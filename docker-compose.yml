@@ -1,9 +1,18 @@
 version: "3.7"
+secrets:
+   spotify_client_id:
+      file: ./spotify_client_id
+   spotify_client_secret:
+      file: ./spotify_client_secret
 services:
    server:
       build: .
       ports:
          - "5001:5001"
+         - "9000:9000"
       volumes:
          - ./:/app
+      secrets:
+         - spotify_client_id
+         - spotify_client_secret
 

@@ -13,11 +13,22 @@ class App extends Component {
    }
 
    async componentDidMount() {
-      const data = await fetch('/playlists?getAll=true', {
-         mode: 'no-cors',
-      });
-      const playlists = await data.json();
-      this.setState({ playlists });
+      try {
+         const data = await fetch('/playlists?getAll=true', {
+            mode: 'no-cors',
+         });
+         const playlists = await data.json();
+         if ([200, 204].includes(data.status)) {
+            this.setState({ playlists });
+         } else {
+            console.log('show error message');
+            alert(playlists.message);
+            window.location.reload();
+         }
+         console.log('data', data);
+      } catch (e) {
+         console.log('e', e);
+      }
    }
 
    handleChange = (e) => {
@@ -54,7 +65,13 @@ class App extends Component {
             {
                this.state.playlists && this.state.playlists.map(p => (
                   <div>
-                     <input onChange={this.handleChange} type='checkbox' key={p.name} name={p.name} value={p.name} />
+                     <input
+                        onChange={this.handleChange}
+                        type='checkbox'
+                        key={p.name}
+                        name={p.name}
+                        value={p.name}
+                     />
                      <label htmlFor={p.name}>{p.name}</label>
                   </div>
                ))

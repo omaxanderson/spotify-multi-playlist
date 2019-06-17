@@ -5,7 +5,7 @@
    "main": "index.js",
    "scripts": {
       "server": "npx nodemon --exec babel-node index.js",
-      "client": "npx webpack-dev-server",
+      "client": "npx webpack-dev-server --host 0.0.0.0",
       "start": "concurrently \"npm run server\" \"npm run client\"",
       "build": "npx webpack",
       "test": "echo \"Error: no test specified\" && exit 1"
