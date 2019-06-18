@@ -14,6 +14,8 @@ The goal of this project is to be able to specify more than one album to play fr
    - Deploy it on Linode or AWS or something
    - Fix some of the spotify API logic to account for pagination
    - Get Vault up and running
+   - change instances of "localhost" to something that dynamically gets the ip address
+   - figure out how to run a docker swarm correctly
 
 
 

@@ -1,12 +1,7 @@
 version: "3.7"
-secrets:
-   spotify_client_id:
-      file: ./spotify_client_id
-   spotify_client_secret:
-      file: ./spotify_client_secret
 services:
    server:
-      build: .
+      image: omaxanderson/spotify-app
       ports:
          - "5001:5001"
          - "9000:9000"
@@ -15,4 +10,9 @@ services:
       secrets:
          - spotify_client_id
          - spotify_client_secret
+secrets:
+   spotify_client_id:
+      external: true
+   spotify_client_secret:
+      external: true
 
