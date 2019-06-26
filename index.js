@@ -140,6 +140,14 @@ f.get('/d', async (req, res) => {
    res.send({success: 'true'});
 });
 
+f.get('/search', async (req, res) => {
+   console.log('PARMS', req.query);
+   const { q, type } = req.query;
+   const { access_token } = req.session;
+   const result = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=${type || 'album,artist,playlist,track'}&access_token=${access_token}`);
+   res.send(result.data);
+});
+
 f.get('/playlists', async (req, res) => {
    const { access_token } = req.session;
    const { getAll } = req.query;
@@ -177,33 +185,6 @@ f.get('/playlists', async (req, res) => {
 
 f.get('/fjdsafdsa', (req, res) => res.send('hello'));
 f.get('/login', async (req, res) => login(req, res));
-/*{
-   if (req.session.access_token) {
-      res.redirect('/');
-      return;
-   }
-
-   if (req.session.refresh_token) {
-      // TODO work out the refresh token logic
-   }
-
-   // need to authenticate
-   const scopes = [
-      'user-modify-playback-state',
-      'user-read-playback-state',
-      'user-read-private',
-      'playlist-read-private',
-      'user-read-email'
-   ].join(' ');
-
-   const redirect_uri = 'http://localhost:5001/authenticate';
-   res.redirect('https://accounts.spotify.com/authorize?'
-      + 'response_type=code'
-      + `&client_id=${process.env.SPOTIFY_CLIENT_ID}`
-      + `&scope=${encodeURIComponent(scopes)}`
-      + `&redirect_uri=${encodeURIComponent(redirect_uri)}`);
-});
-*/
 
 // The redirect route coming back from the spotify /authorize call
 // Should never be called directly

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import T from './components/Test2';
+import { get } from 'lodash';
 
 class App extends Component {
    constructor(props) {
@@ -10,6 +10,17 @@ class App extends Component {
          playlists: [],
          selected: {},
       }
+
+      this.searchRef = React.createRef();
+   }
+
+   search = async (query) => {
+      const encodedQuery = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
+      console.log(get(this.searchRef, 'current.value', ''));
+      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}&type=artist`);
+      const json = await result.json();
+      console.log('res', result);
+      console.log('json', json);
    }
 
    async componentDidMount() {
@@ -60,8 +71,10 @@ class App extends Component {
       console.log('render', this.state.playlists);
       return (
          <div>
-            <p>Hello</p>
+            <p>Hello World</p>
             <button onClick={this.onSubmit}>Submit</button>
+            <button onClick={this.search}>Search</button>
+            <input type='text' id='search_q' ref={this.searchRef} />
             {
                this.state.playlists && this.state.playlists.map(p => (
                   <div>
