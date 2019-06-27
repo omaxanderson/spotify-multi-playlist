@@ -3,15 +3,21 @@ import _ from 'lodash';
 import { authenticate, login } from './authenticate';
 import pov from 'point-of-view';
 import pug from 'pug';
+import path from 'path';
 import { inspect } from 'util';
 import axios from 'axios';
 import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
+import fastifyStatic from 'fastify-static';
 
 const f = fastify({
    logger: {
       prettyPrint: true,
    }
+});
+
+f.register(fastifyStatic, {
+   root: path.join(__dirname, 'public'),
 });
 
 f.register(fastifyCookie);
@@ -30,6 +36,10 @@ f.register(pov, {
       pug
    },
    templates: 'views',
+   options: {
+      views: 'views',
+      filename: 'views/test.pug',
+   }
 });
 
 f.addHook('preHandler', (req, res, next) => {
@@ -71,7 +81,7 @@ f.get('/', async (req, res) => {
       res.redirect('/login');
       return;
    }
-   res.send('home page');
+   res.view('test.pug');
 });
 
 f.get('/devices', async (req, res) => {
@@ -111,8 +121,8 @@ f.put('/play', async (req, res) => {
 f.get('/play/:context_uri/:deviceId', async (req, res) => {
    const { access_token } = req.session;
    const { context_uri, deviceId } = req.params;
-   console.log('context_uri', context_uri);
-   console.log('deviceId', deviceId);
+   // console.log('context_uri', context_uri);
+   // console.log('deviceId', deviceId);
    const request = await axios({
       method: 'PUT',
       url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
@@ -141,7 +151,7 @@ f.get('/d', async (req, res) => {
 });
 
 f.get('/search', async (req, res) => {
-   console.log('PARMS', req.query);
+   // console.log('PARMS', req.query);
    const { q, type } = req.query;
    const { access_token } = req.session;
    const result = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=${type || 'album,artist,playlist,track'}&access_token=${access_token}`);
@@ -157,12 +167,12 @@ f.get('/playlists', async (req, res) => {
    do {
       try {
          const result = await axios.get(`${next}&access_token=${access_token}`);
-         console.log('type', typeof result);
+         // console.log('type', typeof result);
          if (result.status !== 200) {
 
          }
 
-         console.log(result);
+         // console.log(result);
          playlists.push(...result.data.items);
          next = result.data.next;
       } catch (e) {
