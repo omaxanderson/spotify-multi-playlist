@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { get } from 'lodash';
+import { get, capitalize} from 'lodash';
+import List from './components/List';
+import shortid from 'shortid';
 
 class App extends Component {
    constructor(props) {
@@ -8,7 +10,7 @@ class App extends Component {
 
       this.state = {
          playlists: [],
-         selected: {},
+         selected: [],
          currentTab: 'playlists',
          tabOpts: ['playlists', 'search'],
          searchOpts: ['Playlist', 'Album', 'Track', 'Artist'],
@@ -19,22 +21,6 @@ class App extends Component {
       this.state.searchOpts.forEach(opt => {
          this[`ref${opt}`] = React.createRef();
       });
-   }
-
-   search = async (query) => {
-      const vals = this.state.searchOpts.map(opt => {
-         const { value, checked } = this[`ref${opt}`].current;
-         return { option: value.toLowerCase(), checked };
-      });
-      const checked = vals.filter(opt => opt.checked).map(opt => opt.option);;
-      const specifyType = Boolean(vals.map(opt => opt.checked).find(t => t));
-
-      const encodedQuery = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
-      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}`
-         + `${ checked.length ? `&type=${ checked.join(',') }` : '' }`);
-      const json = await result.json();
-      // do something with that shit
-      this.setState({searchResults: json, currentTab: 'search' });
    }
 
    async componentDidMount() {
@@ -56,8 +42,25 @@ class App extends Component {
       }
    }
 
+   search = async (query) => {
+      const vals = this.state.searchOpts.map(opt => {
+         const { value, checked } = this[`ref${opt}`].current;
+         return { option: value.toLowerCase(), checked };
+      });
+      const checked = vals.filter(opt => opt.checked).map(opt => opt.option);;
+      const specifyType = Boolean(vals.map(opt => opt.checked).find(t => t));
+
+      const encodedQuery = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
+      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}`
+         + `${ checked.length ? `&type=${ checked.join(',') }` : '' }`);
+      const json = await result.json();
+      // for convenience later
+      Object.keys(json).forEach(key => json[key].type = key);
+      // do something with that shit
+      this.setState({searchResults: json, currentTab: 'search' });
+   }
+
    handleChange = (e) => {
-      console.log(e);
       const { value } = e.target;
       const state = Object.assign({}, this.state.selected);
       state[value] = state[value] !== undefined ? !state[value] : true;
@@ -66,82 +69,87 @@ class App extends Component {
 
    onSubmit = async (e) => {
       // ugh should honestly just move to sagas before it's too late
+      // probably going to have to change this up
       e.preventDefault();
       console.log('submitting');
-      const playlists = Object.keys(this.state.selected)
-         .filter(k => this.state.selected[k])
-         .map(k => this.state.playlists.find(p => p.name === k));
 
       const result = await fetch('/play', {
          method: 'PUT',
          headers: {
             'Content-Type': 'application/json',
          },
-         body: JSON.stringify(playlists),
+         body: JSON.stringify(this.state.selected),
       });
    }
 
    getToastThing = () => {
-      console.log('yay');
+      const selected = this.state.selected.slice();
       return (
          <div className='selectedToast' >
             <h5 style={{ marginTop: '8px' }}>Selected</h5>
-            {Object.keys(this.state.selected).filter(k => this.state.selected[k]).map(p => <p>{p}</p>)}
+            {this.state.selected.map(item => <p key={shortid.generate()}>{item.name}</p>)}
          </div>
       );
    }
+
+   testOnChange = (item) => {
+      const selected = this.state.selected.slice();
+      const alreadySelected = selected.find(i => i.id === item.id);
+      if (alreadySelected) {
+         this.setState({ selected: selected.filter(i => i.id !== item.id) });
+      } else {
+         this.setState({ selected: selected.concat(item) });
+      }
+   }
+
+   /*
+   shouldComponentUpdate(nextProps, nextState) {
+      return this.state.playlists !== nextState.playlists
+         || this.state.currentTab !== nextState.currentTab
+         || this.state.searchResults !== nextState.searchResults
+         || this.state.selected !== nextState.selected;
+   }
+   */
 
    renderPlaylists = () => {
       return (
          this.state.playlists.length
-            ? this.state.playlists.map(p => (
-               <p>
-                  <label>
-                     <input
-                        onChange={this.handleChange}
-                        type='checkbox'
-                        key={p.name}
-                        name={p.name}
-                        value={p.name}
-                     />
-                     <span>{p.name}</span>
-                  </label>
-               </p>
-            ))
-            : (<div className='row'>
-               <div className='col s4 offset-s4 progress' style={{marginTop: '5vh'}}>
-                  <div className='indeterminate'></div>
+            ? <List
+                  title='Playlists'
+                  itemType='playlist'
+                  onChange={this.testOnChange}
+                  items={this.state.playlists}
+                  checked={this.state.selected}
+               />
+            : (
+               <div className='row'>
+                  <div className='col s4 offset-s4 progress' style={{marginTop: '5vh'}}>
+                     <div className='indeterminate'></div>
+                  </div>
                </div>
-            </div>)
+            )
       )
+   }
+
+   handleSearchClick = (e) => {
+      const { value } = e.target;
+      const state = Object.assign({}, this.state.searchResults);
    }
 
    renderSearchResults = () => {
       const { searchResults } = this.state;
-      console.log(searchResults);
-      const { artists, tracks, albums, playlists } = searchResults;
-      console.log('artists', artists);
-      return (
-         <div>
-            {
-               [artists, tracks, albums, playlists].map(list => {
-                  if (!list) {
-                     return;
-                  }
-                  console.log('list', list);
-                  return (
-                     list.items.map(res => {
-                        return (
-                           <div>
-                              {res.name}
-                           </div>
-                        );
-                     })
-                  );
-               })
-            }
-         </div>
-      );
+      // create list for each search result type
+      const lists = Object.keys(searchResults).map(key => {
+         return (
+            <List
+               key={`${key}_list`}
+               title={key}
+               items={searchResults[key].items}
+               itemType={key}
+            />
+         );
+      });
+      return lists;
    }
 
    toggleView = () => {
@@ -149,9 +157,6 @@ class App extends Component {
       // lol super hacky, only works for two opts
       // be better
       this.setState({ currentTab: this.state.tabOpts[Number(!Boolean(currIdx))] });
-   }
-
-   test = () => {
    }
 
    render() {
@@ -165,17 +170,19 @@ class App extends Component {
             <div className='row'>
                <div className='col s4'>
                   <form onSubmit={e => e.preventDefault()}>
-                     <input type='text' id='search_q' ref={this.searchRef} />
+                     <input placeholder='Search' type='text' id='search_q' ref={this.searchRef} />
                      <button className='btn' type='submit' onClick={this.search}>Search</button>
                   </form>
                </div>
                <div className='col s8'>
 
-                     <button className='btn' onClick={this.test}>test</button>
                   <form>
                      {
                         ['Artist', 'Playlist', 'Track', 'Album'].map(opt => (
-                           <label style={{ display: 'inline', paddingRight: '30px', margin: 'auto', width: '100%'}}>
+                           <label
+                              key={shortid.generate()}
+                              style={{ display: 'inline', paddingRight: '30px', margin: 'auto', width: '100%'}}
+                           >
                               <input ref={this[`ref${opt}`]} name={opt} value={opt} type='checkbox' />
                               <span>{opt}</span>
                            </label>
@@ -187,8 +194,11 @@ class App extends Component {
             <form onSubmit={this.onSubmit}>
                <button className='btn'>Submit</button>
             </form>
-            {this.state.currentTab == 'playlists' && this.renderPlaylists()}
-            {this.state.currentTab == 'search' && this.renderSearchResults()}
+
+            {this.state.currentTab == 'playlists' && this.renderPlaylists() }
+            {this.state.currentTab == 'search' && this.renderSearchResults() }
+            {/* this.state.currentTab == 'playlists' && this.renderPlaylists() */}
+            {/* this.state.currentTab == 'search' && this.renderSearchResults() */}
          </div>
       );
    }
