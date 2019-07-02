@@ -145,6 +145,8 @@ class App extends Component {
                key={`${key}_list`}
                title={key}
                items={searchResults[key].items}
+               checked={this.state.selected}
+               onChange={this.testOnChange}
                itemType={key}
             />
          );

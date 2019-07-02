@@ -36,6 +36,7 @@ export default class List extends Component {
 
 List.defaultProps = {
    items: [],
+   checked: [],
    title: '',
    itemType: 'default',
 }

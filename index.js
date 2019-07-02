@@ -96,14 +96,28 @@ f.put('/play', async (req, res) => {
    const { access_token } = req.session;
    const { body } = req;
 
+   const playlists = body.filter(item => item.type === 'playlist');
+   const albums = body.filter(item => item.type === 'album');
+   const tracks = body.filter(item => item.type === 'track');
+   const artists = body.filter(item => item.type === 'artist');
+   console.log('playlists', playlists);
+   console.log('albums', albums);
+   console.log('track', tracks);
+   console.log('artists', artists);
+
    // get the tracks from the relevant playlists
-   const promises = body.map(playlist => (axios.get(
-      `https://api.spotify.com/v1/playlists/${playlist.id}/tracks?access_token=${access_token}`,
-   )));
+   const promises = body.map(item => {
+      return axios.get(
+      `https://api.spotify.com/v1/${item.type}s/${item.id}/tracks?access_token=${access_token}`,
+      )
+   });
    const results = await Promise.all(promises);
+   console.log('results', results);
    // const uris = _.shuffle(_.flatten(results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)))));
    const uris = results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)));
+
    const holyLodashMethods = _.compact(_.flatten(_.zip(...uris.map(u => _.shuffle(u)))));
+
    const result = await axios({
       method: 'PUT',
       url: 'https://api.spotify.com/v1/me/player/play',
