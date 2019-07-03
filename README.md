@@ -17,6 +17,4 @@ The goal of this project is to be able to specify more than one album to play fr
       * OR figure out how to set up a docker swarm and service that works just like docker-compose
    - change instances of "localhost" to something that dynamically gets the ip address
    - figure out how to run a docker swarm correctly
-
-
-
+   - TypeScript stuff
