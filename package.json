@@ -4,7 +4,7 @@
    "description": "",
    "main": "index.js",
    "scripts": {
-      "server": "npx nodemon --exec babel-node index.js",
+      "server": "npx nodemon --exec ts-node index.ts",
       "client": "npx webpack-dev-server --host 0.0.0.0",
       "start": "concurrently \"npm run server\" \"npm run client\"",
       "build": "npx webpack",
@@ -49,6 +49,7 @@
       "babel-plugin-dynamic-import-node": "^2.2.0",
       "concurrently": "^4.1.0",
       "nodemon": "^1.19.1",
-      "pino-pretty": "^3.1.0"
+      "pino-pretty": "^3.1.0",
+      "ts-node": "^8.3.0"
    }
 }

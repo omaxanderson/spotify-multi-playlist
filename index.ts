@@ -9,6 +9,8 @@ import axios from 'axios';
 import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
 import fastifyStatic from 'fastify-static';
+import Playlist from './services/Playlist';
+import IPlaylist from './interfaces/IPlaylist';
 
 const f = fastify({
    logger: {
@@ -27,7 +29,6 @@ f.register(fastifySession, {
       secure: false,
       maxAge: 3600000,
    },
-   resave: false,
    saveUninitialized: true,
 });
 
@@ -82,6 +83,13 @@ f.get('/', async (req, res) => {
       return;
    }
    res.view('test.pug');
+});
+
+f.get('/test', async (req, res) => {
+   const { access_token } = req.session;
+   const { body } = req;
+   const playlists: IPlaylist = await Playlist.getPlaylist('5eeYXiJZ9A8XVVuAuZ72Hh', access_token);
+   res.send(playlists);
 });
 
 f.get('/devices', async (req, res) => {
@@ -237,7 +245,6 @@ f.get('/playlists', async (req, res) => {
    res.send(playlists.map(({ id, name, uri }) => ({id, name, uri })));
 });
 
-f.get('/fjdsafdsa', (req, res) => res.send('hello'));
 f.get('/login', async (req, res) => login(req, res));
 
 // The redirect route coming back from the spotify /authorize call
