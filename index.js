@@ -121,12 +121,7 @@ f.put('/play', async (req, res) => {
    const trackUris = tracks.map(({uri}) => uri);
 
    // TODO figure out why this isn't working great
-   const holyLodashMethods = _.compact(_.flatten(_.zip(
-      _.shuffle(albumUris),
-      _.shuffle(playlistUris),
-      _.shuffle(artistUris),
-      _.shuffle(trackUris),
-   )));
+   const holyLodashMethods = _.shuffle([...albumUris, ...playlistUris, ...artistUris, ...trackUris]);
 
    // console.log('a', albumUris);
    // console.log('a2', artistUris);
