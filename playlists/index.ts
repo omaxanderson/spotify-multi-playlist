@@ -1,4 +1,4 @@
-import User from '../services/User';
+import User from '../users/User';
 import axios from 'axios';
 import { get } from 'lodash';
 import IPlaylist from '../interfaces/IPlaylist';

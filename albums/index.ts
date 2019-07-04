@@ -1,7 +1,7 @@
 import axios from 'axios';
 import get from 'lodash/get';
 import ITrack from '../interfaces/ITrack';
-import Album from '../services/Album';
+import Album from './Album';
 
 export default async (fastify, opts) => {
    fastify.get('/albums/:albumId', async (req, res) => {

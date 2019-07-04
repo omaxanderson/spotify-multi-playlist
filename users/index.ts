@@ -1,7 +1,7 @@
 import axios from 'axios';
 import get from 'lodash/get';
 import IUser from '../interfaces/IUser';
-import User from '../services/User';
+import User from './User';
 
 export default async (fastify, opts) => {
 

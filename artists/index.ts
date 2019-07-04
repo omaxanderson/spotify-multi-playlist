@@ -1,7 +1,7 @@
 import axios from 'axios';
 import get from 'lodash/get';
 import ITrack from '../interfaces/ITrack';
-import Artist from '../services/Artist';
+import Artist from './Artist';
 import { artistSchema } from './schemas';
 
 export default async (fastify, opts) => {
