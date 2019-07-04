@@ -5,6 +5,6 @@ export default interface IPlaylistTracks {
    items: Array<IPlaylistTrack>;
    limit: number;
    next: string|null;
-   previous: stiring|null;
+   previous: string|null;
    total: number;
 }
