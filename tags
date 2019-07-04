@@ -1,0 +1,100 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Album	albums/Album.ts	/^export default class Album {$/;"	c
+Album	albums/index.ts	/^import Album from '.\/Album';$/;"	I
+Album	index.ts	/^import Album from '.\/albums\/Album';$/;"	I
+Album	player/index.ts	/^import Album from '..\/albums\/Album';$/;"	I
+Artist	artists/Artist.ts	/^export default class Artist {$/;"	c
+Artist	artists/index.ts	/^import Artist from '.\/Artist';$/;"	I
+Artist	index.ts	/^import Artist from '.\/artists\/Artist';$/;"	I
+Artist	player/index.ts	/^import Artist from '..\/artists\/Artist';$/;"	I
+IAlbum	albums/Album.ts	/^import IAlbum from '..\/interfaces\/IAlbum';$/;"	I
+IAlbum	index.ts	/^import IAlbum from '.\/interfaces\/IAlbum';$/;"	I
+IArtist	artists/Artist.ts	/^import IArtist from '..\/interfaces\/IArtist';$/;"	I
+IArtist	index.ts	/^import IArtist from '.\/interfaces\/IArtist';$/;"	I
+IPagingObject	albums/Album.ts	/^import IPagingObject from '..\/interfaces\/IPagingObject';$/;"	I
+IPlayObject	player/index.ts	/^interface IPlayObject {$/;"	i
+IPlaylist	index.ts	/^import IPlaylist from '.\/interfaces\/IPlaylist';$/;"	I
+IPlaylist	interfaces/IUserPlaylists.ts	/^import IPlaylist from '.\/IPlaylist';$/;"	I
+IPlaylist	playlists/Playlist.ts	/^import IPlaylist from '..\/interfaces\/IPlaylist';$/;"	I
+IPlaylist	playlists/index.ts	/^import IPlaylist from '..\/interfaces\/IPlaylist';$/;"	I
+IPlaylist	users/User.ts	/^import IPlaylist from '..\/interfaces\/IPlaylist';$/;"	I
+IPlaylistTrack	interfaces/IPlaylistTracks.ts	/^import IPlaylistTrack from '.\/IPlaylistTrack';$/;"	I
+IPlaylistTrack	playlists/Playlist.ts	/^import IPlaylistTrack from '..\/interfaces\/IPlaylistTrack';$/;"	I
+IPlaylistTracks	index.ts	/^import IPlaylistTracks from '.\/interfaces\/IPlaylistTracks';$/;"	I
+IPlaylistTracks	interfaces/IPlaylist.ts	/^import IPlaylistTracks from '.\/IPlaylistTracks';$/;"	I
+IPlaylistTracks	player/index.ts	/^import IPlaylistTracks from '..\/interfaces\/IPlaylistTracks';$/;"	I
+IPlaylistTracks	playlists/Playlist.ts	/^import IPlaylistTracks from '..\/interfaces\/IPlaylistTracks';$/;"	I
+ITrack	albums/Album.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+ITrack	albums/index.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+ITrack	artists/Artist.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+ITrack	artists/index.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+ITrack	index.ts	/^import ITrack from '.\/interfaces\/ITrack';$/;"	I
+ITrack	interfaces/IPlaylistTrack.ts	/^import ITrack from '.\/ITrack';$/;"	I
+ITrack	player/index.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+ITrack	playlists/Playlist.ts	/^import ITrack from '..\/interfaces\/ITrack';$/;"	I
+IUser	index.ts	/^import IUser from '.\/interfaces\/IUser';$/;"	I
+IUser	users/User.ts	/^import IUser from '..\/interfaces\/IUser';$/;"	I
+IUser	users/index.ts	/^import IUser from '..\/interfaces\/IUser';$/;"	I
+IUserPlaylists	index.ts	/^import IUserPlaylists from '.\/interfaces\/IUserPlaylists';$/;"	I
+List.defaultProps.items	src/components/List.js	/^   items: [],$/;"	p
+Playlist	index.ts	/^import Playlist from '.\/playlists\/Playlist';$/;"	I
+Playlist	player/index.ts	/^import Playlist from '..\/playlists\/Playlist';$/;"	I
+Playlist	playlists/Playlist.ts	/^export default class Playlist {$/;"	c
+User	index.ts	/^import User from '.\/users\/User';$/;"	I
+User	playlists/index.ts	/^import User from '..\/users\/User';$/;"	I
+User	users/User.ts	/^export default class User {$/;"	c
+User	users/index.ts	/^import User from '.\/User';$/;"	I
+_	index.ts	/^import _ from 'lodash';$/;"	I
+_	player/index.ts	/^import _ from 'lodash';$/;"	I
+albumRoutes	index.ts	/^import albumRoutes from '.\/albums';$/;"	I
+artistRoutes	index.ts	/^import artistRoutes from '.\/artists';$/;"	I
+artistSchema	artists/schemas.ts	/^export const artistSchema = {$/;"	v
+authenticate	authenticate.ts	/^export const authenticate = async (req, res) => {$/;"	v
+axios	albums/Album.ts	/^import axios from 'axios';$/;"	I
+axios	albums/index.ts	/^import axios from 'axios';$/;"	I
+axios	artists/Artist.ts	/^import axios from 'axios';$/;"	I
+axios	artists/index.ts	/^import axios from 'axios';$/;"	I
+axios	authenticate.ts	/^import axios from 'axios';$/;"	I
+axios	index.ts	/^import axios from 'axios';$/;"	I
+axios	player/index.ts	/^import axios from 'axios';$/;"	I
+axios	playlists/Playlist.ts	/^import axios from 'axios';$/;"	I
+axios	playlists/index.ts	/^import axios from 'axios';$/;"	I
+axios	users/User.ts	/^import axios from 'axios';$/;"	I
+axios	users/index.ts	/^import axios from 'axios';$/;"	I
+const.client_id	authenticate_old.js	/^         client_id: process.env.SPOTIFY_CLIENT_ID,$/;"	p
+const.grant_type	authenticate_old.js	/^         grant_type: 'authorization_code',$/;"	p
+const.grant_type	authenticate_old.js	/^         grant_type: 'refresh_token',$/;"	p
+const.redirect_uri	authenticate_old.js	/^         redirect_uri: 'http:\/\/localhost:5001\/authenticate',$/;"	p
+const.refresh_token	authenticate_old.js	/^         refresh_token: req.session.refresh_token,$/;"	p
+fastify	index.ts	/^import fastify from 'fastify';$/;"	I
+fastifyCookie	index.ts	/^import fastifyCookie from 'fastify-cookie';$/;"	I
+fastifySession	index.ts	/^import fastifySession from 'fastify-session';$/;"	I
+fastifyStatic	index.ts	/^import fastifyStatic from 'fastify-static';$/;"	I
+fs	authenticate.ts	/^import fs from 'fs';$/;"	I
+get	albums/index.ts	/^import get from 'lodash\/get';$/;"	I
+get	artists/index.ts	/^import get from 'lodash\/get';$/;"	I
+get	users/index.ts	/^import get from 'lodash\/get';$/;"	I
+getAlbum	albums/Album.ts	/^   static getAlbum = async (albumId: string, accessToken: string): Promise<IAlbum>=> {$/;"	f
+getAlbumTracks	albums/Album.ts	/^   static getAlbumTracks = async (albumId: string, accessToken: string, limit: number = 20): Promise<Array<ITrack>>=> {$/;"	f
+getArtist	artists/Artist.ts	/^   static getArtist = async (artistId: string, accessToken: string): Promise<IArtist> => {$/;"	f
+getArtistTopTracks	artists/Artist.ts	/^   static getArtistTopTracks = async (artistId: string, accessToken: string): Promise<Array<ITrack>> => {$/;"	f
+getPlaylist	playlists/Playlist.ts	/^   static getPlaylist = async (playlistId: string, accessToken: string): Promise<IPlaylist> => {$/;"	f
+getPlaylistTracks	playlists/Playlist.ts	/^   static getPlaylistTracks = async (playlistId: string, accessToken: string): Promise<Array<ITrack>> => {$/;"	f
+getUserInfo	users/User.ts	/^   static getUserInfo = async (userId: string, accessToken: string): Promise<IUser> => {$/;"	f
+getUserPlaylists	users/User.ts	/^   static getUserPlaylists = async (userId: string, accessToken: string, limit: number = 20, offset: number = 0): Promise<Array<IPlaylist>> => {$/;"	f
+login	authenticate.ts	/^export const login = async (req, res) => {$/;"	v
+module.exports.entry	webpack.config.js	/^   entry: entries(),$/;"	p
+module.exports.mode	webpack.config.js	/^   mode: 'development',$/;"	p
+path	index.ts	/^import path from 'path';$/;"	I
+playSchema	player/schemas.ts	/^export const playSchema = {$/;"	v
+playerRoutes	index.ts	/^import playerRoutes from '.\/player';$/;"	I
+playlistRoutes	index.ts	/^import playlistRoutes from '.\/playlists';$/;"	I
+pov	index.ts	/^import pov from 'point-of-view';$/;"	I
+pug	index.ts	/^import pug from 'pug';$/;"	I
+state.playlists	src/App.js	/^         playlists: [],$/;"	p
+userRoutes	index.ts	/^import userRoutes from '.\/users';$/;"	I

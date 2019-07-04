@@ -13,16 +13,19 @@ export default class User {
     *
     * @return Array<IPlaylist>
    */
-   static getUserPlaylists = async (userId: string, accessToken: string, limit: number = 20, offset: number = 0): Promise<Array<IPlaylist>> => {
+   static getUserPlaylists = async (
+      userId: string,
+      accessToken: string,
+      limit: number = 20,
+      offset: number = 0): Promise<Array<IPlaylist>> => {
+
       // if limit is -1, that means get all playlists
       // else if limit > 50, we're going to have to make multiple requests
       const playlists: Array<IPlaylist> = [];
       let next = `https://api.spotify.com/v1/users/${userId}/playlists?offset=${offset}&limit=${limit > 50 || limit < 0 ? 50 : limit}` 
       do {
          try {
-            const result = await axios.get(
-               `${next}&access_token=${accessToken}`
-            );
+            const result = await axios.get(`${next}&access_token=${accessToken}`);
             next = get(result, 'data.next', false);
             playlists.push(...get(result, 'data.items', []));
          } catch (e) {
