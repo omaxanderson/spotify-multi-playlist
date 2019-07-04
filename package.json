@@ -5,9 +5,11 @@
    "main": "index.js",
    "scripts": {
       "server": "npx nodemon --exec ts-node index.ts",
-      "client": "npx webpack-dev-server --host 0.0.0.0",
+      "client": "npx webpack-dev-server --host 0.0.0.0 --disable-host-check",
       "start": "concurrently \"npm run server\" \"npm run client\"",
-      "build": "npx webpack",
+      "serve:prod": "concurrently \"npm run build:client\" \"npm run build:server\" && npx babel-node build/index.js",
+      "build:client": "npx webpack",
+      "build:server": "tsc",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "",
