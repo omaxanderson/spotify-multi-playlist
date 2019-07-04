@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { get, capitalize} from 'lodash';
 import List from './components/List';
 import shortid from 'shortid';
+import M from 'materialize-css';
 
 class App extends Component {
    constructor(props) {
@@ -13,17 +14,21 @@ class App extends Component {
          selected: [],
          currentTab: 'playlists',
          tabOpts: ['playlists', 'search'],
-         searchOpts: ['Playlist', 'Album', 'Track', 'Artist'],
+         // searchOpts: ['Playlist', 'Album', 'Track', 'Artist'],
          searchResults: {},
       }
 
       this.searchRef = React.createRef();
+      /*
       this.state.searchOpts.forEach(opt => {
          this[`ref${opt}`] = React.createRef();
       });
+      */
    }
 
    async componentDidMount() {
+      M.Collapsible.init(document.querySelectorAll('.collapsible'), {});
+
       try {
          const data = await fetch('/playlists?getAll=true', {
             mode: 'no-cors',
@@ -42,20 +47,14 @@ class App extends Component {
       }
    }
 
-   search = async (query) => {
-      const vals = this.state.searchOpts.map(opt => {
-         const { value, checked } = this[`ref${opt}`].current;
-         return { option: value.toLowerCase(), checked };
-      });
-      const checked = vals.filter(opt => opt.checked).map(opt => opt.option);;
-      const specifyType = Boolean(vals.map(opt => opt.checked).find(t => t));
-
-      const encodedQuery = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
-      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}`
-         + `${ checked.length ? `&type=${ checked.join(',') }` : '' }`);
+   search = async () => {
+      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}`);
       const json = await result.json();
+
       // for convenience later
+      //    edit: ...why?
       Object.keys(json).forEach(key => json[key].type = key);
+
       // do something with that shit
       this.setState({searchResults: json, currentTab: 'search' });
    }
@@ -63,6 +62,7 @@ class App extends Component {
    handleChange = (e) => {
       const { value } = e.target;
       const state = Object.assign({}, this.state.selected);
+      console.log('here?');
       state[value] = state[value] !== undefined ? !state[value] : true;
       this.setState({ selected: state });
    }
@@ -140,18 +140,54 @@ class App extends Component {
       const { searchResults } = this.state;
       // create list for each search result type
       const lists = Object.keys(searchResults).map(key => {
-         return (
-            <List
+         return {
+            title: key,
+            jsx: (<List
                key={`${key}_list`}
                title={key}
+               titleClass={'hide-on-small-and-down'}
                items={searchResults[key].items}
                checked={this.state.selected}
                onChange={this.testOnChange}
                itemType={key}
-            />
-         );
+            />),
+         };
       });
-      return lists;
+
+      setTimeout(() => {
+         M.Collapsible.init(document.querySelectorAll('.collapsible'), {accordion: false});
+      }, 50);
+
+      return (
+         <div>
+            <div className='hide-on-med-and-up'>
+               <ul className='collapsible expandable'>
+                  {lists.map(list => {
+                     return (
+                        <li key={list.title} className='active'>
+                           <h5 className='collapsible-header'>{list.title}</h5>
+                           <div className='collapsible-body'>{list.jsx}</div>
+                        </li>
+                     );
+                  })}
+               </ul>
+            </div>
+            <div className='hide-on-small-and-down'>
+               <div className='row'>
+                  <div className='col l6'>
+                     {lists.slice(0, 2).map(list => {
+                        return list.jsx;
+                     })}
+                  </div>
+                  <div className='col l6'>
+                     {lists.slice(2, 4).map(list => {
+                        return list.jsx;
+                     })}
+                  </div>
+               </div>
+            </div>
+         </div>
+      );
    }
 
    toggleView = () => {
@@ -164,43 +200,26 @@ class App extends Component {
    render() {
       return (
          <div className='container'>
-            <h3 onClick={this.toggleView} >Hello World</h3>
+            <h3 onClick={this.toggleView} >Spotify Multi-Playlist</h3>
             {
                Object.values(this.state.selected).find(a => a)
                   && this.getToastThing()
             }
             <div className='row'>
-               <div className='col s4'>
-                  <form onSubmit={e => e.preventDefault()}>
-                     <input placeholder='Search' type='text' id='search_q' ref={this.searchRef} />
-                     <button className='btn' type='submit' onClick={this.search}>Search</button>
-                  </form>
-               </div>
-               <div className='col s8'>
-
-                  <form>
-                     {
-                        ['Artist', 'Playlist', 'Track', 'Album'].map(opt => (
-                           <label
-                              key={shortid.generate()}
-                              style={{ display: 'inline', paddingRight: '30px', margin: 'auto', width: '100%'}}
-                           >
-                              <input ref={this[`ref${opt}`]} name={opt} value={opt} type='checkbox' />
-                              <span>{opt}</span>
-                           </label>
-                        ))
-                     }
-                  </form>
-               </div>
+               <form onSubmit={e => e.preventDefault()}>
+                  <input placeholder='Search' type='text' id='search_q' ref={this.searchRef} />
+                  <button className='btn' type='submit' onClick={this.search}>Search</button>
+               </form>
             </div>
-            <form onSubmit={this.onSubmit}>
-               <button className='btn'>Submit</button>
-            </form>
-
-            {this.state.currentTab == 'playlists' && this.renderPlaylists() }
-            {this.state.currentTab == 'search' && this.renderSearchResults() }
-            {/* this.state.currentTab == 'playlists' && this.renderPlaylists() */}
-            {/* this.state.currentTab == 'search' && this.renderSearchResults() */}
+            <div className='row'>
+               <form onSubmit={this.onSubmit}>
+                  <button className='btn'>Submit</button>
+               </form>
+            </div>
+            <div className='row'>
+               {this.state.currentTab == 'playlists' && this.renderPlaylists() }
+               {this.state.currentTab == 'search' && this.renderSearchResults() }
+            </div>
          </div>
       );
    }

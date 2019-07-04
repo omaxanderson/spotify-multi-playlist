@@ -100,6 +100,10 @@ f.get('/pug', (req, res) => {
    res.view('test.pug');
 });
 
+f.get('/info', (req, res) => {
+   res.view('info.pug');
+});
+
 f.get('/', async (req, res) => {
    const { access_token } = req.session;
    if (!access_token) {

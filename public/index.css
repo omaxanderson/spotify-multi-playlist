@@ -8,3 +8,23 @@
    padding: 20px;
    z-index: 100000;
 }
+
+.collapsible-header {
+   margin-top: 0px;
+   margin-bottom: 0px;
+}
+
+.collapsible-body {
+   padding-top: 8px;
+}
+
+/* fun idea, not really worth */
+/*
+.hover-test {
+   display:none;
+}
+
+.hover-first:hover > .hover-test {
+   display: inline;
+}
+*/
