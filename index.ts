@@ -1,6 +1,6 @@
 import fastify from 'fastify';
 import _ from 'lodash';
-import { authenticate, login } from './authenticate';
+// import { authenticate, login } from './authenticate';
 import pov from 'point-of-view';
 import pug from 'pug';
 import path from 'path';
@@ -20,6 +20,11 @@ import IUser from './interfaces/IUser';
 import IAlbum from './interfaces/IAlbum';
 import IArtist from './interfaces/IArtist';
 import ITrack from './interfaces/ITrack';
+
+import playlistRoutes from './playlists';
+import userRoutes from './users';
+import albumRoutes from './albums';
+import artistRoutes from './artists';
 
 const f = fastify({
    logger: {
@@ -52,6 +57,12 @@ f.register(pov, {
    }
 });
 
+// Register the playlist routes
+f.register(playlistRoutes);
+f.register(userRoutes);
+f.register(artistRoutes);
+f.register(albumRoutes);
+
 f.addHook('preHandler', (req, res, next) => {
    const { url } = req.raw;
    if (![
@@ -75,10 +86,13 @@ const isAuthed = (req, res, next) => {
    }
 }
 
+/* ============= REMOVE THESE ROUTES ============== */
+   /*
 f.get('/refresh', async (req, res) => {
    const result = await authenticate(req, res);
    res.send(result);
 });
+*/
 
 f.get('/pug', (req, res) => {
    res.view('test.pug');
@@ -197,15 +211,6 @@ f.get('/play/:context_uri/:deviceId', async (req, res) => {
    });
 });
 
-f.get('/playlists/:playlistId', async (req, res) => {
-   const { access_token } = req.session;
-   const { playlistId } = req.params;
-   const tracks = await axios.get(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&access_token=${access_token}`
-   );
-   res.send({ tracks: tracks.data.items.map(({track}) => ({name: track.name, uri: track.uri}) )});
-});
-
 // For simpler debugging
 f.get('/d', async (req, res) => {
    req.session.access_token = 'invalid access token';
@@ -219,50 +224,6 @@ f.get('/search', async (req, res) => {
    const result = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=${type || 'album,artist,playlist,track'}&access_token=${access_token}`);
    res.send(result.data);
 });
-
-f.get('/users/:userId', async (req, res) => {
-   const { access_token } = req.session;
-   const { userId } = req.params;
-   const info: IUser = await User.getUserInfo(userId, access_token);
-   res.send(info);
-});
-
-f.get('/playlists', async (req, res) => {
-   const { access_token } = req.session;
-   const { getAll } = req.query;
-
-   console.log(access_token);
-   const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, -1);
-
-   // TODO add metadata to the response
-   //    Also going to need to update the client logic to account for change from [] to {}
-   res.send(playlists.map(({ id, name, uri }) => ({id, name, uri })));
-});
-
-f.get('/albums/:albumId', async (req, res) => {
-   const { access_token } = req.session;
-   const { albumId } = req.params;
-
-   const album: Array<ITrack> = await Album.getAlbumTracks(albumId, access_token);
-
-   res.send(album);
-});
-
-f.get('/artists/:artistId', async (req, res) => {
-   const { access_token } = req.session;
-   const { artistId } = req.params;
-
-   const artist: Array<ITrack> = await Artist.getArtistTopTracks(artistId, access_token);
-
-   res.send(artist);
-});
-
-f.get('/login', async (req, res) => login(req, res));
-
-// The redirect route coming back from the spotify /authorize call
-// Should never be called directly
-// TODO see whether fastify can restrict who a call is coming from
-f.get('/authenticate', async (req, res) => authenticate(req, res));
 
 f.listen(5001, '0.0.0.0', (err, addr) => {
    if (err) throw err;
