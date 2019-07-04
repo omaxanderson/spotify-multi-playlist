@@ -213,7 +213,7 @@ class App extends Component {
             </div>
             <div className='row'>
                <form onSubmit={this.onSubmit}>
-                  <button className='btn'>Submit</button>
+                  <button className='btn'>Submit<i className='material-icons right'>send</i></button>
                </form>
             </div>
             <div className='row'>

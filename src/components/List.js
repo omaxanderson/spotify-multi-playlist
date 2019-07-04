@@ -14,13 +14,11 @@ export default class List extends Component {
    render() {
       return (
          <div>
-            {this.props.title && <h5 className={this.props.titleClass} >{this.props.title}</h5>}
+            {this.props.title && <h4 className={this.props.titleClass} >{this.props.title}</h4>}
             {this.props.items.map(item => {
                let additionalInfoPath = '';
                switch (this.props.title) {
                   case 'albums':
-                     additionalInfoPath = 'artists[0].name';
-                     break;
                   case 'tracks':
                      additionalInfoPath = 'artists[0].name';
                      break;
