@@ -25,6 +25,7 @@ import playlistRoutes from './playlists';
 import userRoutes from './users';
 import albumRoutes from './albums';
 import artistRoutes from './artists';
+import playerRoutes from './player';
 
 const f = fastify({
    logger: {
@@ -62,6 +63,7 @@ f.register(playlistRoutes);
 f.register(userRoutes);
 f.register(artistRoutes);
 f.register(albumRoutes);
+f.register(playerRoutes);
 
 f.addHook('preHandler', (req, res, next) => {
    const { url } = req.raw;
@@ -121,76 +123,6 @@ f.get('/devices', async (req, res) => {
       `https://api.spotify.com/v1/me/player/devices?access_token=${access_token}`
    );
    res.send({ devices: devices.data });
-});
-
-f.put('/play', async (req, res) => {
-   const { access_token } = req.session;
-   const { body } = req;
-
-   const playlists = body.filter(item => item.type === 'playlist');
-   const albums = body.filter(item => item.type === 'album');
-   const tracks = body.filter(item => item.type === 'track');
-   const artists = body.filter(item => item.type === 'artist');
-
-   const playlistPromises = playlists.map(p => axios.get(
-      `https://api.spotify.com/v1/playlists/${p.id}/tracks?access_token=${access_token}`
-   ));
-   const artistPromises = artists.map(a => axios.get(
-      `https://api.spotify.com/v1/artists/${a.id}/top-tracks?access_token=${access_token}&country=US`
-   ));
-   const albumPromises = albums.map(a => axios.get(
-      `https://api.spotify.com/v1/albums/${a.id}/tracks?access_token=${access_token}&limit=50`
-   ));
-
-   const playlistTracks = await Promise.all(playlistPromises);
-   const artistTracks = await Promise.all(artistPromises);
-   const albumTracks = await Promise.all(albumPromises);
-
-   const albumUris = _.flatten(albumTracks.map(({data}) => data.items)).map(t => t.uri);
-   const playlistUris = _.flatten(playlistTracks.map(({data}) => data.items)).map(({track}) => track.uri);
-   const artistUris = _.flatten(artistTracks.map(({data}) => data.tracks)).map(t => t.uri);
-   const trackUris = tracks.map(({uri}) => uri);
-
-   // TODO figure out why this isn't working great
-   const holyLodashMethods = _.shuffle([...albumUris, ...playlistUris, ...artistUris, ...trackUris]);
-
-   // console.log('a', albumUris);
-   // console.log('a2', artistUris);
-
-   // console.log(dataObjects);
-   // const objects = results.map(result => ({ items: result.data.items, type: result.data.type }));
-   // console.log('objects', objects);
-
-   /*
-   const results = await Promise.all(
-      playlistPromises,
-      artistPromises,
-      albumsPromises
-   );
-   /*
-   console.log('playlistTracks', playlistTracks);
-   console.log('artistTracks', artistTracks);
-   console.log('albumsTracks', albumTracks);
-   console.log('results', results);
-   // const uris = _.shuffle(_.flatten(results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)))));
-   const uris = results.map(playlist => playlist.data.items.map(obj => (obj.track.uri)));
-   console.log('uris', uris);
-
-   const holyLodashMethods = _.compact(_.flatten(_.zip(...uris.map(u => _.shuffle(u)))));
-
-*/
-   const result = await axios({
-      method: 'PUT',
-      url: 'https://api.spotify.com/v1/me/player/play',
-      headers: {
-         'Content-Type': 'application/json',
-         'Authorization': `Bearer ${access_token}`,
-      },
-      data: {
-         uris: holyLodashMethods,
-      },
-   });
-   res.send(200);
 });
 
 f.get('/play/:context_uri/:deviceId', async (req, res) => {
