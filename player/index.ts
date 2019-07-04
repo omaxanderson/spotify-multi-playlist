@@ -1,39 +1,73 @@
 import axios from 'axios';
 import _ from 'lodash';
-import { playBodySchema } from './schemas';
+import { playSchema } from './schemas';
+import Artist from '../artists/Artist';
+import Album from '../albums/Album';
+import Playlist from '../playlists/Playlist';
+import IPlaylistTracks from '../interfaces/IPlaylistTracks';
+import ITrack from '../interfaces/ITrack';
+
+interface IPlayObject {
+   id: string;
+   name: string;
+   uri: string;
+   type: string;
+}
 
 export default async (fastify, opts) => {
-   fastify.put('/play', async (req, res) => {
+   fastify.put('/play', { schema: playSchema }, async (req, res) => {
       const { access_token } = req.session;
       const { body } = req;
 
-      const playlists = body.filter(item => item.type === 'playlist');
-      const albums = body.filter(item => item.type === 'album');
-      const tracks = body.filter(item => item.type === 'track');
-      const artists = body.filter(item => item.type === 'artist');
+      const playlists: Array<IPlayObject> = body.filter(item => item.type === 'playlist');
+      const albums: Array<IPlayObject> = body.filter(item => item.type === 'album');
+      const tracks: Array<IPlayObject> = body.filter(item => item.type === 'track');
+      const artists: Array<IPlayObject> = body.filter(item => item.type === 'artist');
 
-      const playlistPromises = playlists.map(p => axios.get(
-         `https://api.spotify.com/v1/playlists/${p.id}/tracks?access_token=${access_token}`
-      ));
-      const artistPromises = artists.map(a => axios.get(
-         `https://api.spotify.com/v1/artists/${a.id}/top-tracks?access_token=${access_token}&country=US`
-      ));
-      const albumPromises = albums.map(a => axios.get(
-         `https://api.spotify.com/v1/albums/${a.id}/tracks?access_token=${access_token}&limit=50`
-      ));
+      const playlistPromises: Array<Promise<Array<ITrack>>> = playlists.map(p => Playlist.getPlaylistTracks(p.id, access_token));
+      const albumPromises: Array<Promise<Array<ITrack>>> = albums.map(a => Album.getAlbumTracks(a.id, access_token));
+      const artistPromises: Array<Promise<Array<ITrack>>> = artists.map(a => Artist.getArtistTopTracks(a.id, access_token));
 
-      const playlistTracks = await Promise.all(playlistPromises);
-      const artistTracks = await Promise.all(artistPromises);
-      const albumTracks = await Promise.all(albumPromises);
+      const playlistObjects: Array<Array<ITrack>> = await Promise.all(playlistPromises);
+      const albumObjects: Array<Array<ITrack>> = await Promise.all(albumPromises);
+      const artistObjects: Array<Array<ITrack>> = await Promise.all(artistPromises);
 
-      const albumUris = _.flatten(albumTracks.map(({data}) => data.items)).map(t => t.uri);
-      const playlistUris = _.flatten(playlistTracks.map(({data}) => data.items)).map(({track}) => track.uri);
-      const artistUris = _.flatten(artistTracks.map(({data}) => data.tracks)).map(t => t.uri);
-      const trackUris = tracks.map(({uri}) => uri);
 
-      // TODO figure out why this isn't working great
-      const holyLodashMethods = _.shuffle([...albumUris, ...playlistUris, ...artistUris, ...trackUris]);
+      // for ease of use, maybe allow a parameter object to Playlist.getPlaylistTracks to specify columns we want
+      const playlistUris: Array<Array<string>> = playlistObjects.map(arr => _.shuffle(arr).map(({ uri }) => uri));
+      const albumUris: Array<Array<string>> = albumObjects.map(arr => _.shuffle(arr).map(({uri}) => uri));
+      const artistUris: Array<Array<string>> = artistObjects.map(arr => _.shuffle(arr).map(({ uri }) => uri));
+      const trackUris: Array<Array<string>> = [tracks.map(({uri}) => uri)];
+
+      const max = [playlistUris, albumUris, artistUris, trackUris].reduce((maxLen, arr) => arr.length > maxLen ? arr.length : maxLen, 0);
+
+      const test = [];
+      for (let i = 0; i < max; i++) {
+         if (playlistUris.length > i) {
+            test.push(playlistUris[i]);
+         }
+         if (albumUris.length > i) {
+            test.push(albumUris[i]);
+         }
+         if (artistUris.length > i) {
+            test.push(artistUris[i]);
+         }
+         if (trackUris.length > i) {
+            test.push(trackUris[i]);
+         }
+      }
+
+      const flattened = _.compact(_.flatten(_.zip(...test)));
       try {
+         // Change shuffle to off
+         const toggleShuffle = await axios({
+            method: 'PUT',
+            url: 'https://api.spotify.com/v1/me/player/shuffle?state=false',
+            headers: {
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${access_token}`,
+            },
+         });
          const result = await axios({
             method: 'PUT',
             url: 'https://api.spotify.com/v1/me/player/play',
@@ -42,7 +76,7 @@ export default async (fastify, opts) => {
                'Authorization': `Bearer ${access_token}`,
             },
             data: {
-               uris: holyLodashMethods,
+               uris: flattened,
             },
          });
          res.send(200);
@@ -55,8 +89,6 @@ export default async (fastify, opts) => {
    fastify.get('/play/:context_uri/:deviceId', async (req, res) => {
       const { access_token } = req.session;
       const { context_uri, deviceId } = req.params;
-      // console.log('context_uri', context_uri);
-      // console.log('deviceId', deviceId);
       const request = await axios({
          method: 'PUT',
          url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,

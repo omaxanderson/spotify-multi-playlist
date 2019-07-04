@@ -2,16 +2,19 @@ import axios from 'axios';
 import { get } from 'lodash';
 import IPlaylist from '../interfaces/IPlaylist';
 import IPlaylistTracks from '../interfaces/IPlaylistTracks';
+import ITrack from '../interfaces/ITrack';
+import IPlaylistTrack from '../interfaces/IPlaylistTrack';
 
 export default class Playlist {
 
-   static getPlaylistTracks = async (playlistId: string, accessToken: string): Promise<IPlaylistTracks> => {
+   static getPlaylistTracks = async (playlistId: string, accessToken: string): Promise<Array<ITrack>> => {
       try {
          const result = await axios.get(
             `https://api.spotify.com/v1/playlists/${playlistId}/tracks?access_token=${accessToken}`
          );
          console.log('RESULT', result);
-         return get(result, 'data.items', []);
+         const tracks: Array<IPlaylistTrack> = get(result, 'data.items', []);
+         return tracks.map(t => t.track);
       } catch (e) {
          console.log('FAILED', e);
          return e;
