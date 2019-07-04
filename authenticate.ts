@@ -42,6 +42,12 @@ export const authenticate = async (req, res) => {
          req.session.access_token = access_token;
          req.session.refresh_token = refresh_token;
 
+         // can't for the life of me figure out why i can't make this a promise we don't have
+         // to use await for...
+         const me = await axios.get(`https://api.spotify.com/v1/me?access_token=${access_token}`)
+         console.log('setting spotify user_id', me.data.id);
+         req.session.spotify_user_id = me.data.id;
+
          console.log('access', access_token);
          console.log('refresh', refresh_token);
 

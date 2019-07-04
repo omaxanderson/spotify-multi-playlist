@@ -10,7 +10,16 @@ import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
 import fastifyStatic from 'fastify-static';
 import Playlist from './services/Playlist';
+import User from './services/User';
+import Album from './services/Album';
+import Artist from './services/Artist';
 import IPlaylist from './interfaces/IPlaylist';
+import IPlaylistTracks from './interfaces/IPlaylistTracks';
+import IUserPlaylists from './interfaces/IUserPlaylists';
+import IUser from './interfaces/IUser';
+import IAlbum from './interfaces/IAlbum';
+import IArtist from './interfaces/IArtist';
+import ITrack from './interfaces/ITrack';
 
 const f = fastify({
    logger: {
@@ -88,8 +97,8 @@ f.get('/', async (req, res) => {
 f.get('/test', async (req, res) => {
    const { access_token } = req.session;
    const { body } = req;
-   const playlists: IPlaylist = await Playlist.getPlaylist('5eeYXiJZ9A8XVVuAuZ72Hh', access_token);
-   res.send(playlists);
+   const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, 72);
+   res.send(playlists.length);
 });
 
 f.get('/devices', async (req, res) => {
@@ -197,6 +206,7 @@ f.get('/playlists/:playlistId', async (req, res) => {
    res.send({ tracks: tracks.data.items.map(({track}) => ({name: track.name, uri: track.uri}) )});
 });
 
+// For simpler debugging
 f.get('/d', async (req, res) => {
    req.session.access_token = 'invalid access token';
    res.send({success: 'true'});
@@ -210,39 +220,41 @@ f.get('/search', async (req, res) => {
    res.send(result.data);
 });
 
+f.get('/users/:userId', async (req, res) => {
+   const { access_token } = req.session;
+   const { userId } = req.params;
+   const info: IUser = await User.getUserInfo(userId, access_token);
+   res.send(info);
+});
+
 f.get('/playlists', async (req, res) => {
    const { access_token } = req.session;
    const { getAll } = req.query;
+
    console.log(access_token);
-   const playlists = [];
-   let next = `https://api.spotify.com/v1/me/playlists?limit=50`;
-   do {
-      try {
-         const result = await axios.get(`${next}&access_token=${access_token}`);
-         // console.log('type', typeof result);
-         if (result.status !== 200) {
-
-         }
-
-         // console.log(result);
-         playlists.push(...result.data.items);
-         next = result.data.next;
-      } catch (e) {
-         const { response } = e;
-         if ([400, 401].includes(response.status)) {
-            await authenticate(req, res);
-            res.code(response.status).send({
-               status: response.status,
-               message: "Session expired, please refresh the page",
-            });
-            return;
-         }
-      }
-   } while (next && getAll);
+   const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, -1);
 
    // TODO add metadata to the response
    //    Also going to need to update the client logic to account for change from [] to {}
    res.send(playlists.map(({ id, name, uri }) => ({id, name, uri })));
+});
+
+f.get('/albums/:albumId', async (req, res) => {
+   const { access_token } = req.session;
+   const { albumId } = req.params;
+
+   const album: Array<ITrack> = await Album.getAlbumTracks(albumId, access_token);
+
+   res.send(album);
+});
+
+f.get('/artists/:artistId', async (req, res) => {
+   const { access_token } = req.session;
+   const { artistId } = req.params;
+
+   const artist: Array<ITrack> = await Artist.getArtistTopTracks(artistId, access_token);
+
+   res.send(artist);
 });
 
 f.get('/login', async (req, res) => login(req, res));

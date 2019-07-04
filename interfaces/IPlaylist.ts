@@ -15,7 +15,7 @@ export default interface IPlaylist {
    primay_color: any;
    public: boolean;
    snapshot_id: string;
-   tracks: IPlaylistTracks; // TODO create ITracks
+   tracks: IPlaylistTracks|Object;
    type: string;
    uri: string;
 }
