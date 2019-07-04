@@ -4,7 +4,7 @@ The goal of this project is to be able to specify more than one album to play fr
 
 #### Roadmap/Todo
 
-   - IN PROGRESS: Split index.js into a few different files - I just hacked this together so it's currently ugly as hell.
+   - ~~Split index.js into a few different files - I just hacked this together so it's currently ugly as hell.~~
    - ~~Make it look pretty~~
    - ~~Fix the /pug endpoint to a more reasonable name~~
    - ~~Add a searching feature~~
