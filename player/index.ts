@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import { playBodySchema } from './schemas';
 
 export default async (fastify, opts) => {
    fastify.put('/play', async (req, res) => {
@@ -49,5 +50,31 @@ export default async (fastify, opts) => {
          console.log(e);
          res.send(400);
       }
+   });
+
+   fastify.get('/play/:context_uri/:deviceId', async (req, res) => {
+      const { access_token } = req.session;
+      const { context_uri, deviceId } = req.params;
+      // console.log('context_uri', context_uri);
+      // console.log('deviceId', deviceId);
+      const request = await axios({
+         method: 'PUT',
+         url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+         headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access_token}`,
+         },
+         data: {
+            context_uri
+         },
+      });
+   });
+
+   fastify.get('/devices', async (req, res) => {
+      const { access_token } = req.session;
+      const devices = await axios.get(
+         `https://api.spotify.com/v1/me/player/devices?access_token=${access_token}`
+      );
+      res.send({ devices: devices.data });
    });
 };

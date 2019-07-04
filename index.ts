@@ -110,38 +110,6 @@ f.get('/', async (req, res) => {
    res.view('test.pug');
 });
 
-f.get('/test', async (req, res) => {
-   const { access_token } = req.session;
-   const { body } = req;
-   const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, 72);
-   res.send(playlists.length);
-});
-
-f.get('/devices', async (req, res) => {
-   const { access_token } = req.session;
-   const devices = await axios.get(
-      `https://api.spotify.com/v1/me/player/devices?access_token=${access_token}`
-   );
-   res.send({ devices: devices.data });
-});
-
-f.get('/play/:context_uri/:deviceId', async (req, res) => {
-   const { access_token } = req.session;
-   const { context_uri, deviceId } = req.params;
-   // console.log('context_uri', context_uri);
-   // console.log('deviceId', deviceId);
-   const request = await axios({
-      method: 'PUT',
-      url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
-      headers: {
-         'Content-Type': 'application/json',
-         'Authorization': `Bearer ${access_token}`,
-      },
-      data: {
-         context_uri
-      },
-   });
-});
 
 // For simpler debugging
 f.get('/d', async (req, res) => {
