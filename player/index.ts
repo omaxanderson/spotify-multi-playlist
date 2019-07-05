@@ -82,8 +82,14 @@ export default async (fastify, opts) => {
 
          res.send(200);
       } catch (e) {
+         const { response, request, message } = e;
+         if (response) {
+            res.status(response.status);
+            res.send(response.data);
+            return;
+         }
          console.log(e);
-         res.send(400);
+         res.send();
       }
    });
 

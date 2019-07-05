@@ -7,6 +7,10 @@ export default function* watchAll() {
 }
 
 function* play(action) {
+   yield put({
+      type: 'ON_PLAY',
+   });
+
    console.log('attempting to play');
    const results = yield fetch('/play', {
       method: 'PUT',
@@ -28,7 +32,7 @@ function* play(action) {
       console.log(json);
       yield put({
          type: 'PLAY_ERROR',
-         message: json.message,
+         error: json.error,
       });
    }
 

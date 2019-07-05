@@ -41,22 +41,11 @@ class App extends Component {
       // ugh should honestly just move to sagas before it's too late
       // probably going to have to change this up
       e.preventDefault();
-      console.log('submitting');
 
       this.props.dispatch({
          type: 'PLAY',
          payload: this.state.selected,
       });
-
-      /*
-      const result = await fetch('/play', {
-         method: 'PUT',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(this.state.selected),
-      });
-      */
    }
 
    getToastThing = () => {
@@ -217,6 +206,7 @@ class App extends Component {
                </form>
             </div>
             <div className='row'>
+               {<div className='red-text'>{this.props.playError}</div>}
                {this.state.currentTab == 'playlists' && this.renderPlaylists() }
                {this.state.currentTab == 'search' && this.renderSearchResults() }
             </div>
@@ -231,6 +221,8 @@ const Connected = connect(state => ({
    searchResults: get(state, 'search.results', {}),
    searchLoading: get(state, 'search.loading', false),
    searchError: get(state, 'search.error', ''),
+   playLoading: get(state, 'player.loading', ''),
+   playError: get(state, 'player.error', ''),
 }))(App);
 
 ReactDOM.render((
