@@ -1,70 +1,40 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 import { get, capitalize} from 'lodash';
 import List from './components/List';
+import Loader from './components/Loader';
 import shortid from 'shortid';
+import { Provider } from 'react-redux';
 import M from 'materialize-css';
+import store from './store';
 
 class App extends Component {
    constructor(props) {
       super(props);
 
       this.state = {
-         playlists: [],
          selected: [],
          currentTab: 'playlists',
          tabOpts: ['playlists', 'search'],
-         // searchOpts: ['Playlist', 'Album', 'Track', 'Artist'],
-         searchResults: {},
       }
 
       this.searchRef = React.createRef();
-      /*
-      this.state.searchOpts.forEach(opt => {
-         this[`ref${opt}`] = React.createRef();
-      });
-      */
    }
 
    async componentDidMount() {
+      this.props.dispatch({
+         type: 'FETCH_PLAYLISTS',
+      });
       M.Collapsible.init(document.querySelectorAll('.collapsible'), {});
-
-      try {
-         const data = await fetch('/playlists?getAll=true', {
-            mode: 'no-cors',
-         });
-         const playlists = await data.json();
-         if ([200, 204].includes(data.status)) {
-            this.setState({ playlists });
-         } else {
-            console.log('show error message');
-            alert(playlists.message);
-            window.location.reload();
-         }
-         console.log('data', data);
-      } catch (e) {
-         console.log('e', e);
-      }
    }
 
    search = async () => {
-      const result = await fetch(`/search?q=${get(this.searchRef, 'current.value', '')}`);
-      const json = await result.json();
-
-      // for convenience later
-      //    edit: ...why?
-      Object.keys(json).forEach(key => json[key].type = key);
-
-      // do something with that shit
-      this.setState({searchResults: json, currentTab: 'search' });
-   }
-
-   handleChange = (e) => {
-      const { value } = e.target;
-      const state = Object.assign({}, this.state.selected);
-      console.log('here?');
-      state[value] = state[value] !== undefined ? !state[value] : true;
-      this.setState({ selected: state });
+      this.props.dispatch({
+         type: 'SEARCH',
+         payload: get(this.searchRef, 'current.value'),
+      });
+      this.setState({ currentTab: 'search' });
    }
 
    onSubmit = async (e) => {
@@ -73,6 +43,12 @@ class App extends Component {
       e.preventDefault();
       console.log('submitting');
 
+      this.props.dispatch({
+         type: 'PLAY',
+         payload: this.state.selected,
+      });
+
+      /*
       const result = await fetch('/play', {
          method: 'PUT',
          headers: {
@@ -80,6 +56,7 @@ class App extends Component {
          },
          body: JSON.stringify(this.state.selected),
       });
+      */
    }
 
    getToastThing = () => {
@@ -113,20 +90,16 @@ class App extends Component {
 
    renderPlaylists = () => {
       return (
-         this.state.playlists.length
+         this.props.playlists.length
             ? <List
                   title='Playlists'
                   itemType='playlist'
                   onChange={this.testOnChange}
-                  items={this.state.playlists}
+                  items={this.props.playlists}
                   checked={this.state.selected}
                />
             : (
-               <div className='row'>
-                  <div className='col s4 offset-s4 progress' style={{marginTop: '5vh'}}>
-                     <div className='indeterminate'></div>
-                  </div>
-               </div>
+               <Loader />
             )
       )
    }
@@ -137,7 +110,14 @@ class App extends Component {
    }
 
    renderSearchResults = () => {
-      const { searchResults } = this.state;
+      const { searchResults } = this.props;
+
+      if (!Object.keys(searchResults).length) {
+         // render loader
+         console.log('rendering loader?');
+         return <Loader />
+      }
+
       // create list for each search result type
       const lists = Object.keys(searchResults).map(key => {
          return {
@@ -197,9 +177,17 @@ class App extends Component {
       this.setState({ currentTab: this.state.tabOpts[Number(!Boolean(currIdx))] });
    }
 
+   reducerTest = () => {
+      this.props.dispatch({
+         type: 'FETCH_PLAYLISTS',
+         payload: true,
+      });
+   }
+
    render() {
       return (
          <div className='container'>
+            <button className='btn' onClick={this.reducerTest}>Test</button>
             <h3 onClick={this.toggleView} >Spotify Multi-Playlist</h3>
             {
                Object.values(this.state.selected).find(a => a)
@@ -225,4 +213,14 @@ class App extends Component {
    }
 }
 
-ReactDOM.render(<App />, document.getElementById('App'));
+const Connected = connect(state => ({
+   playlists: get(state, 'playlists', []),
+   searchResults: get(state, 'searchResults', {}),
+   test: get(state, 'test', null),
+}))(App);
+
+ReactDOM.render((
+   <Provider store={store}>
+      <Connected />
+   </Provider>
+), document.getElementById('App'));

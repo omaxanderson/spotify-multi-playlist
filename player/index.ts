@@ -79,6 +79,7 @@ export default async (fastify, opts) => {
                uris: flattened,
             },
          });
+
          res.send(200);
       } catch (e) {
          console.log(e);

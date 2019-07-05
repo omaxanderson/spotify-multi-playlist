@@ -53,6 +53,7 @@
       "concurrently": "^4.1.0",
       "nodemon": "^1.19.1",
       "pino-pretty": "^3.1.0",
+      "redux-devtools-extension": "^2.13.8",
       "ts-node": "^8.3.0"
    }
 }
