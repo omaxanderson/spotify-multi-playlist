@@ -7,7 +7,11 @@ export default function* watchAll() {
 }
 
 function* fetchPlaylists(action) {
-   console.log('in testsaga');
+   // to tell the loader to fire
+   yield put({
+      type: 'ON_FETCH_PLAYLISTS',
+   });
+
    const results = yield fetch(`/playlists`);
    const payload = yield results.json();
 

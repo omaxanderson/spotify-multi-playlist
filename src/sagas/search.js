@@ -7,13 +7,24 @@ export default function* watchAll() {
 }
 
 function* search(action) {
+   yield put({
+      type: 'ON_SEARCH',
+   });
+
    const results = yield fetch(`/search?q=${action.payload}`);
    const payload = yield results.json();
 
-   yield put({
-      type: 'SEARCH_SUCCESS',
-      payload,
-   });
+   if (results.status === 200) {
+      yield put({
+         type: 'SEARCH_SUCCESS',
+         payload,
+      });
+   } else {
+      yield put({
+         type: 'SEARCH_ERROR',
+         payload,
+      });
+   }
 
    return true;
 }

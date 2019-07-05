@@ -125,8 +125,24 @@ f.get('/search', async (req, res) => {
    // console.log('PARMS', req.query);
    const { q, type } = req.query;
    const { access_token } = req.session;
-   const result = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=${type || 'album,artist,playlist,track'}&access_token=${access_token}`);
-   res.send(result.data);
+   try {
+      const result = await axios.get(`https://api.spotify.com/v1/search?q=${q}&type=${type || 'album,artist,playlist,track'}&access_token=${access_token}`);
+      res.send(result.data);
+   } catch (e) {
+      const { response, request, message } = e;
+      if (response) {
+         res.status(response.status);
+         res.send(response.data);
+         return;
+      } else if (request) {
+         // do something else i guess
+         res.send({ message: 'no response received' });
+         return;
+      } else {
+         res.send({ message });
+         return;
+      }
+   }
 });
 
 f.listen(5001, '0.0.0.0', (err, addr) => {

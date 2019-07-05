@@ -89,6 +89,14 @@ class App extends Component {
    */
 
    renderPlaylists = () => {
+      if (!this.props.playlists.length) {
+         if (this.props.playlistsLoading) {
+            return <Loader />;
+         } else {
+            return <div>You have no playlists to display!</div>;
+         }
+      }
+
       return (
          this.props.playlists.length
             ? <List
@@ -110,27 +118,39 @@ class App extends Component {
    }
 
    renderSearchResults = () => {
-      const { searchResults } = this.props;
+      const {
+         searchResults: results,
+         searchLoading: loading,
+         searchError: error,
+      } = this.props;
 
-      if (!Object.keys(searchResults).length) {
-         // render loader
-         console.log('rendering loader?');
-         return <Loader />
+      if (error) {
+         return <div>{error}</div>;
+      }
+
+      if (!Object.keys(results).length) {
+         if (loading) {
+            return <Loader />
+         } else {
+            return <div>No results to display!</div>;
+         }
       }
 
       // create list for each search result type
-      const lists = Object.keys(searchResults).map(key => {
+      const lists = Object.keys(results).map(key => {
          return {
             title: key,
-            jsx: (<List
-               key={`${key}_list`}
-               title={key}
-               titleClass={'hide-on-small-and-down'}
-               items={searchResults[key].items}
-               checked={this.state.selected}
-               onChange={this.testOnChange}
-               itemType={key}
-            />),
+            jsx: (
+               <List
+                  key={`${key}_list`}
+                  title={key}
+                  titleClass={'hide-on-small-and-down'}
+                  items={results[key].items}
+                  checked={this.state.selected}
+                  onChange={this.testOnChange}
+                  itemType={key}
+               />
+            ),
          };
       });
 
@@ -177,17 +197,9 @@ class App extends Component {
       this.setState({ currentTab: this.state.tabOpts[Number(!Boolean(currIdx))] });
    }
 
-   reducerTest = () => {
-      this.props.dispatch({
-         type: 'FETCH_PLAYLISTS',
-         payload: true,
-      });
-   }
-
    render() {
       return (
          <div className='container'>
-            <button className='btn' onClick={this.reducerTest}>Test</button>
             <h3 onClick={this.toggleView} >Spotify Multi-Playlist</h3>
             {
                Object.values(this.state.selected).find(a => a)
@@ -214,9 +226,11 @@ class App extends Component {
 }
 
 const Connected = connect(state => ({
-   playlists: get(state, 'playlists', []),
-   searchResults: get(state, 'searchResults', {}),
-   test: get(state, 'test', null),
+   playlists: get(state, 'playlists.results', []),
+   playlistsLoading: get(state, 'playlists.loading', false),
+   searchResults: get(state, 'search.results', {}),
+   searchLoading: get(state, 'search.loading', false),
+   searchError: get(state, 'search.error', ''),
 }))(App);
 
 ReactDOM.render((
