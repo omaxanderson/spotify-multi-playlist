@@ -21,6 +21,7 @@ The goal of this project is to be able to specify more than one album to play fr
    - Add alternate shuffling methods
    - Fix the way you swap between your playlists and the search results
    - Add ~~loading and~~ success/failure notifications when you hit ~~search or~~ submit
-   - Clear out the search bar on click
+   - ~~Clear out the search bar on click~~
    - Clear everything after successful submission
    - Clear the error message on new submit
+   - ~~Figure out playlists.map bug~~

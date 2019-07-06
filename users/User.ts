@@ -29,7 +29,16 @@ export default class User {
             next = get(result, 'data.next', false);
             playlists.push(...get(result, 'data.items', []));
          } catch (e) {
-            return e;
+            const { response, request, message } = e;
+            if (response) {
+               console.log(response.data);
+            } else if (request) {
+               console.log(request);
+            } else if (message) {
+               console.log(message);
+            }
+
+            return [];
          }
       } while (next && (limit >= 0 ? playlists.length < limit : true))
 
