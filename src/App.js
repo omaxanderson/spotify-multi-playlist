@@ -240,6 +240,18 @@ class App extends Component {
    render() {
       return (
          <div className='container'>
+            {
+               this.props.playLoading &&
+                  <div className='progress' style={{
+                     position: 'fixed',
+                     top: '0px',
+                     left: '0px',
+                     right: '0px',
+                        marginTop: '0px',
+                  }}>
+                     <div style={{marginTop: '0px'}} className='indeterminate'></div>
+                  </div>
+            }
             <h4 onClick={this.toggleView} >Spotify Multi-Playlist</h4>
             {
                Object.values(this.state.selected).find(a => a)
