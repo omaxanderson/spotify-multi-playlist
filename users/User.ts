@@ -19,6 +19,10 @@ export default class User {
       limit: number = 20,
       offset: number = 0): Promise<Array<IPlaylist>> => {
 
+      if (!userId) {
+         userId = 'me';
+      }
+
       // if limit is -1, that means get all playlists
       // else if limit > 50, we're going to have to make multiple requests
       const playlists: Array<IPlaylist> = [];

@@ -18,9 +18,8 @@ export default async (fastify, opts) => {
       const { getAll } = req.query;
 
       console.log(access_token);
-      const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, -1);
-      console.log('GETTING ERROR HERE');
-      console.log('type', typeof playlists);
+      // we're gonna need to update this if we add the ability to search other users' playlists
+      const playlists: Array<IPlaylist> = await User.getUserPlaylists(false, access_token, -1);
 
       // TODO add metadata to the response
       //    Also going to need to update the client logic to account for change from [] to {}
