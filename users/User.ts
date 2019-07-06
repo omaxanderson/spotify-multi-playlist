@@ -21,12 +21,14 @@ export default class User {
 
       if (!userId) {
          userId = 'me';
+      } else {
+         userId = `users/${userId}`;
       }
 
       // if limit is -1, that means get all playlists
       // else if limit > 50, we're going to have to make multiple requests
       const playlists: Array<IPlaylist> = [];
-      let next = `https://api.spotify.com/v1/users/${userId}/playlists?offset=${offset}&limit=${limit > 50 || limit < 0 ? 50 : limit}` 
+      let next = `https://api.spotify.com/v1/${userId}/playlists?offset=${offset}&limit=${limit > 50 || limit < 0 ? 50 : limit}` 
       do {
          try {
             const result = await axios.get(`${next}&access_token=${accessToken}`);
