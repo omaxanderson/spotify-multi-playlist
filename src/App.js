@@ -30,7 +30,10 @@ class App extends Component {
       M.Collapsible.init(document.querySelectorAll('.collapsible'), {});
    }
 
-   search = async () => {
+   search = async (e) => {
+      if (e) {
+         e.preventDefault();
+      }
       this.props.dispatch({
          type: 'SEARCH',
          payload: get(this.searchRef, 'current.value'),
@@ -120,15 +123,6 @@ class App extends Component {
          this.setState({ selected: selected.concat(item) });
       }
    }
-
-   /*
-   shouldComponentUpdate(nextProps, nextState) {
-      return this.state.playlists !== nextState.playlists
-         || this.state.currentTab !== nextState.currentTab
-         || this.state.searchResults !== nextState.searchResults
-         || this.state.selected !== nextState.selected;
-   }
-   */
 
    renderPlaylists = () => {
       if (!this.props.playlists.length) {
@@ -239,6 +233,10 @@ class App extends Component {
       this.setState({ currentTab: this.state.tabOpts[Number(!Boolean(currIdx))] });
    }
 
+   clearSearch = () => {
+      this.searchRef.current.value = '';
+   }
+
    render() {
       return (
          <div className='container'>
@@ -247,12 +245,24 @@ class App extends Component {
                Object.values(this.state.selected).find(a => a)
                   && this.getToastThing()
             }
-            <div className='row'>
-               <form onSubmit={e => e.preventDefault()}>
-                  <input placeholder='Search' type='text' id='search_q' ref={this.searchRef} />
-                  <button className='btn' type='submit' onClick={this.search}>Search</button>
-               </form>
-            </div>
+
+            <form className='my-wrapper' onSubmit={this.search}>
+               <div className='search-input input-field'>
+                  <input placeholder='Search' type='search' id='search_q' ref={this.searchRef} />
+                  <i style={{transform: 'translateY(5px)'}} className='material-icons' onClick={this.clearSearch}>close</i>
+               </div>
+               <div className='search-button'>
+                  <button
+                     style={{transform: 'translateY(15px)'}}
+                     className='btn'
+                     type='submit'
+                     onClick={this.search}
+                  >
+                     Search
+                  </button>
+               </div>
+            </form>
+
             <div className='row'>
                <form onSubmit={this.onSubmit}>
                   <button className='btn'>Submit<i className='material-icons right'>send</i></button>

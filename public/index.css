@@ -44,5 +44,19 @@
 }
 
 .trash:hover {
-   color: #F23755;
+   color: #F55B73;
+}
+
+.my-wrapper {
+   display: flex;
+   flex-direction: row;
+}
+
+.search-input {
+   flex: 1;
+   margin-right: 20px;
+}
+
+.search-button {
+   float: right;
 }
