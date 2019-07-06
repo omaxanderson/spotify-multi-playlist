@@ -8,11 +8,14 @@ import player from './sagas/player';
 
 const sagaMiddleware = createSagaMiddleware();
 
+const devToolsInstalled = Boolean(window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__);
+console.log(devToolsInstalled);
+
 export default createStore(
    rootReducer,
    compose(
       applyMiddleware(sagaMiddleware),
-      composeWithDevTools(),
+      devToolsInstalled ? composeWithDevTools() : a => a,
    ),
 );
 
