@@ -17,6 +17,7 @@ class App extends Component {
          selected: [],
          currentTab: 'playlists',
          tabOpts: ['playlists', 'search'],
+         toastMinimized: false,
       }
 
       this.searchRef = React.createRef();
@@ -48,12 +49,64 @@ class App extends Component {
       });
    }
 
+   removeSelected = (removeId) => {
+      const selected = this.state.selected
+         .slice()
+         .filter(item => item.id !== removeId);
+      this.setState({ selected });
+   }
+
+   toggleToastMinimized = () => {
+      this.setState({ toastMinimized: !this.state.toastMinimized });
+   }
+
    getToastThing = () => {
+      if (this.state.toastMinimized) {
+         console.log('minimized');
+      } else {
+         console.log('not minimized');
+      }
+
       const selected = this.state.selected.slice();
       return (
-         <div className='selectedToast' >
-            <h5 style={{ marginTop: '8px' }}>Selected</h5>
-            {this.state.selected.map(item => <p key={shortid.generate()}>{item.name}</p>)}
+         <div
+            className='selectedToast'
+            style={this.state.toastMinimized ? {paddingBottom: '5px'} : {}}
+         >
+            <div
+               className='row'
+               style={{marginBottom: '0px' }}
+            >
+               <h5 style={{ marginTop: '0px', marginBottom: '0px' }} className='left'>Selected</h5>
+               <a
+                  style={{transform: 'translateY(-5px)'}}
+                  className='btn-flat right'
+                  onClick={this.toggleToastMinimized}
+               >
+                  <i className='material-icons'>
+                     {`arrow_drop_${this.state.toastMinimized ? 'up' : 'down'}`}
+                  </i>
+               </a>
+            </div>
+            {!this.state.toastMinimized && this.state.selected.map(item => (
+               <div
+                  key={shortid.generate()}
+                  data-name={item.name}
+                  data-id={item.id}
+                  style={{marginBottom: '0px', marginTop: '6px'}}
+                  className='row'
+               >
+                  <span style={{padding: '0px'}} className='col s11 m10 truncate'>{item.name}</span>
+                  <span>
+                     <i
+                        className='col s1 m2 material-icons right trash'
+                        onClick={() => this.removeSelected(item.id)}
+                     >
+                        delete
+                     </i>
+                  </span>
+               </div>
+            ))}
          </div>
       );
    }
@@ -189,7 +242,7 @@ class App extends Component {
    render() {
       return (
          <div className='container'>
-            <h3 onClick={this.toggleView} >Spotify Multi-Playlist</h3>
+            <h4 onClick={this.toggleView} >Spotify Multi-Playlist</h4>
             {
                Object.values(this.state.selected).find(a => a)
                   && this.getToastThing()

@@ -1,12 +1,24 @@
 .selectedToast {
    position: fixed;
-   bottom: 10px;
-   right: 10px;
-   background-color: #EEEEEE;
+   bottom: 0px;
+   right: 0px;
+   background-color: #26a69a;
+   color: white;
    border: 1px solid #DDDDDD;
-   border-radius: 7px;
-   padding: 20px;
+   padding: 15px;
    z-index: 100000;
+}
+
+@media only screen and (max-width: 600px) {
+   .selectedToast {
+      width: 100%;
+   }
+}
+
+@media only screen and (min-width: 600px) {
+   .selectedToast {
+      width: 33%;
+   }
 }
 
 .collapsible-header {
@@ -19,12 +31,18 @@
 }
 
 /* fun idea, not really worth */
-/*
 .hover-test {
-   display:none;
+   display: none !important;
 }
 
 .hover-first:hover > .hover-test {
-   display: inline;
+   display: inline !important;
 }
-*/
+
+.trash {
+   cursor: pointer;
+}
+
+.trash:hover {
+   color: #F23755;
+}

@@ -19,6 +19,8 @@ export default async (fastify, opts) => {
 
       console.log(access_token);
       const playlists: Array<IPlaylist> = await User.getUserPlaylists('o_max_anderson', access_token, -1);
+      console.log('GETTING ERROR HERE');
+      console.log('type', typeof playlists);
 
       // TODO add metadata to the response
       //    Also going to need to update the client logic to account for change from [] to {}

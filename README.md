@@ -23,3 +23,4 @@ The goal of this project is to be able to specify more than one album to play fr
    - Add ~~loading and~~ success/failure notifications when you hit ~~search or~~ submit
    - Clear out the search bar on click
    - Clear everything after successful submission
+   - Clear the error message on new submit
