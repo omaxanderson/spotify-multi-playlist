@@ -31,7 +31,7 @@ export default async (fastify, opts) => {
          'user-read-email'
       ].join(' ');
 
-      const redirect_uri = 'http://localhost:5001/authenticate';
+      const redirect_uri = 'http://www.omaxwellanderson.com/authenticate';
       res.redirect('https://accounts.spotify.com/authorize?'
          + 'response_type=code'
          + `&client_id=${process.env.SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`
@@ -53,7 +53,7 @@ export default async (fastify, opts) => {
          const data = {
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'http://localhost:5001/authenticate',
+            redirect_uri: 'http://www.omaxwellanderson.com/authenticate',
             client_id: process.env.SPOTIFY_CLIENT_ID,
             client_secret: process.env.SPOTIFY_CLIENT_SECRET,
          };
@@ -102,7 +102,7 @@ export default async (fastify, opts) => {
          const data = {
             grant_type: 'refresh_token',
             refresh_token: req.session.refresh_token,
-            redirect_uri: 'http://localhost:5001/authenticate',
+            redirect_uri: 'http://www.omaxwellanderson.com/authenticate',
             client_id: process.env.SPOTIFY_CLIENT_ID,
             client_secret: process.env.SPOTIFY_CLIENT_SECRET,
          };

@@ -145,7 +145,7 @@ f.get('/search', async (req, res) => {
    }
 });
 
-f.listen(5001, '0.0.0.0', (err, addr) => {
+f.listen(80, '0.0.0.0', (err, addr) => {
    if (err) throw err;
    f.log.info(`server listening on ${addr}`);
 });
