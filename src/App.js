@@ -265,9 +265,17 @@ class App extends Component {
             </form>
 
             <div className='row'>
-               <form onSubmit={this.onSubmit}>
+               <form className='col s4' onSubmit={this.onSubmit}>
                   <button className='btn'>Submit<i className='material-icons right'>send</i></button>
                </form>
+               <div className='switch right'>
+                  <label>
+                     My Playlists
+                     <input type='checkbox' onChange={this.toggleView} checked={this.state.currentTab === 'search'} />
+                     <span className='lever'></span>
+                     Search Results
+                  </label>
+               </div>
             </div>
             <div className='row'>
                {<div className='red-text'>{this.props.playError}</div>}
