@@ -14,7 +14,7 @@ class App extends Component {
       super(props);
 
       this.state = {
-         selected: [],
+         // selected: [],
          currentTab: 'playlists',
          tabOpts: ['playlists', 'search'],
          toastMinimized: false,
@@ -42,18 +42,16 @@ class App extends Component {
    }
 
    onSubmit = async (e) => {
-      // ugh should honestly just move to sagas before it's too late
-      // probably going to have to change this up
       e.preventDefault();
 
       this.props.dispatch({
          type: 'PLAY',
-         payload: this.state.selected,
+         payload: this.props.selected,
       });
    }
 
    removeSelected = (removeId) => {
-      const selected = this.state.selected
+      const selected = this.props.selected
          .slice()
          .filter(item => item.id !== removeId);
       this.setState({ selected });
@@ -64,13 +62,7 @@ class App extends Component {
    }
 
    getToastThing = () => {
-      if (this.state.toastMinimized) {
-         console.log('minimized');
-      } else {
-         console.log('not minimized');
-      }
-
-      const selected = this.state.selected.slice();
+      const selected = this.props.selected.slice();
       return (
          <div
             className='selectedToast'
@@ -91,7 +83,7 @@ class App extends Component {
                   </i>
                </a>
             </div>
-            {!this.state.toastMinimized && this.state.selected.map(item => (
+            {!this.state.toastMinimized && this.props.selected.map(item => (
                <div
                   key={shortid.generate()}
                   data-name={item.name}
@@ -115,13 +107,10 @@ class App extends Component {
    }
 
    testOnChange = (item) => {
-      const selected = this.state.selected.slice();
-      const alreadySelected = selected.find(i => i.id === item.id);
-      if (alreadySelected) {
-         this.setState({ selected: selected.filter(i => i.id !== item.id) });
-      } else {
-         this.setState({ selected: selected.concat(item) });
-      }
+      this.props.dispatch({
+         type: 'ON_SELECT',
+         payload: item,
+      });
    }
 
    renderPlaylists = () => {
@@ -140,7 +129,7 @@ class App extends Component {
                   itemType='playlist'
                   onChange={this.testOnChange}
                   items={this.props.playlists}
-                  checked={this.state.selected}
+                  checked={this.props.selected}
                />
             : (
                <Loader />
@@ -182,7 +171,7 @@ class App extends Component {
                   title={key}
                   titleClass={'hide-on-small-and-down'}
                   items={results[key].items}
-                  checked={this.state.selected}
+                  checked={this.props.selected}
                   onChange={this.testOnChange}
                   itemType={key}
                />
@@ -254,7 +243,7 @@ class App extends Component {
             }
             <h4 onClick={this.toggleView} >Spotify Multi-Playlist</h4>
             {
-               Object.values(this.state.selected).find(a => a)
+               Object.values(this.props.selected).find(a => a)
                   && this.getToastThing()
             }
 
@@ -298,6 +287,7 @@ const Connected = connect(state => ({
    searchError: get(state, 'search.error', ''),
    playLoading: get(state, 'player.loading', ''),
    playError: get(state, 'player.error', ''),
+   selected: get(state, 'selected', []),
 }))(App);
 
 ReactDOM.render((
