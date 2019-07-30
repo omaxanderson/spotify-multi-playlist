@@ -10,6 +10,10 @@ services:
       secrets:
          - spotify_client_id
          - spotify_client_secret
+   nginx:
+      image: nginx:1.17.2-alpine
+      volumes:
+         - ./spotify.nginx.conf:/usr/share/nginx/nginx.conf
 secrets:
    spotify_client_id:
       external: true

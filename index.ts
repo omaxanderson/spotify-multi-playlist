@@ -5,6 +5,7 @@ import pov from 'point-of-view';
 import pug from 'pug';
 import path from 'path';
 import { inspect } from 'util';
+import { promises } from 'fs';
 import axios from 'axios';
 import fastifySession from 'fastify-session';
 import fastifyCookie from 'fastify-cookie';
@@ -32,6 +33,20 @@ const f = fastify({
       prettyPrint: true,
    }
 });
+
+// set env variables
+(async () => {
+   try {
+      const spotify_client_id = await promises.readFile('/run/secrets/spotify_client_id', 'utf8');
+      const spotify_client_secret = await promises.readFile('/run/secrets/spotify_client_secret', 'utf8');
+      process.env.SPOTIFY_CLIENT_ID = spotify_client_id;
+      process.env.SPOTIFY_CLIENT_SECRET = spotify_client_secret;
+      console.log('set secrets');
+   } catch (e) {
+
+   }
+   console.log(process.env.SPOTIFY_CLIENT_ID);
+})();
 
 f.register(fastifyStatic, {
    root: path.join(__dirname, 'public'),
@@ -72,6 +87,7 @@ f.addHook('preHandler', (req, res, next) => {
       '/authenticate',
    ].includes(url.split('?')[0])) {
       if (!req.session.access_token) {
+         console.log('redirecting...');
          res.redirect('/login');
          return;
       }
@@ -105,6 +121,7 @@ f.get('/info', (req, res) => {
 });
 
 f.get('/', async (req, res) => {
+   console.log('spotify', process.env.spotify_client_id);
    const { access_token } = req.session;
    if (!access_token) {
       // watch out for redirect loop??

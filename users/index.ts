@@ -2,6 +2,7 @@ import axios from 'axios';
 import get from 'lodash/get';
 import IUser from '../interfaces/IUser';
 import User from './User';
+import util from 'util';
 
 export default async (fastify, opts) => {
 
@@ -13,6 +14,7 @@ export default async (fastify, opts) => {
    });
 
    fastify.get('/login', async (req, res) => {
+      console.log('at login');
       if (req.session.access_token) {
          res.redirect('/');
          return;
@@ -32,17 +34,22 @@ export default async (fastify, opts) => {
       ].join(' ');
 
       const redirect_uri = 'http://localhost:5001/authenticate';
-      res.redirect('https://accounts.spotify.com/authorize?'
+      console.log('about to redirect...');
+      console.log(util.inspect(res));
+      const url = 'https://accounts.spotify.com/authorize?'
          + 'response_type=code'
          + `&client_id=${process.env.SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`
          + `&scope=${encodeURIComponent(scopes)}`
-         + `&redirect_uri=${encodeURIComponent(redirect_uri)}`);
+         + `&redirect_uri=${encodeURIComponent(redirect_uri)}`;
+      console.log(url);
+      res.redirect(url);
    });
 
    // The redirect route coming back from the spotify /authorize call
    // Should never be called directly
    // TODO see whether fastify can restrict who a call is coming from
    fastify.get('/authenticate', async (req, res) => {
+      console.log('in authenticate');
       const {
          error,
          code,
@@ -58,6 +65,7 @@ export default async (fastify, opts) => {
             client_secret: process.env.SPOTIFY_CLIENT_SECRET,
          };
 
+         console.log('posting for token');
          const result = await axios({
             method: 'POST',
             url: 'https://accounts.spotify.com/api/token',
@@ -71,6 +79,7 @@ export default async (fastify, opts) => {
             ],
          });
 
+         console.log('result came back');
          if (result.status === 200) {
             const {
                access_token,
