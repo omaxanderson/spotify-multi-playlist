@@ -1,0 +1,3 @@
+docker build --tag server -f Dockerfile .
+docker build --tag client -f Dockerfile-client .
+docker stack deploy --compose-file=docker-compose.yml my_stack

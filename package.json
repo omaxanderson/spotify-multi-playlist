@@ -11,6 +11,7 @@
       "serve:prod": "concurrently \"npm run build:client\" \"npm run build:server\" && npx babel-node build/index.js",
       "build:client": "npx webpack",
       "build:server": "tsc",
+      "server:prod": "node build/index.js",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "",

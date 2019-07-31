@@ -1,0 +1,23 @@
+# Stage 1
+FROM node:10 as build-client
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+copy ./ /app/
+
+RUN npm run build:client
+
+# Stage 2
+FROM nginx:1.16
+
+COPY --from=build-client /app/dist/ /usr/share/nginx/html
+COPY --from=build-client /app/spotify.nginx.conf /etc/nginx/nginx.conf
+EXPOSE 9000
+EXPOSE 9001
+
+RUN mkdir -p /etc/nginx/logs/
+
+CMD ["nginx", "-g", "daemon off;"]

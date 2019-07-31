@@ -36,8 +36,8 @@ const f = fastify_1.default({
     try {
         const spotify_client_id = yield fs_1.promises.readFile('/run/secrets/spotify_client_id', 'utf8');
         const spotify_client_secret = yield fs_1.promises.readFile('/run/secrets/spotify_client_secret', 'utf8');
-        process.env.SPOTIFY_CLIENT_ID = spotify_client_id;
-        process.env.SPOTIFY_CLIENT_SECRET = spotify_client_secret;
+        process.env.SPOTIFY_CLIENT_ID = spotify_client_id.replace(/\n/g, '');
+        process.env.SPOTIFY_CLIENT_SECRET = spotify_client_secret.replace(/\n/g, '');
         console.log('set secrets');
     }
     catch (e) {

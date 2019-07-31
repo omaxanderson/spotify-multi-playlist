@@ -1,19 +1,24 @@
 version: "3.7"
 services:
    server:
-      image: omaxanderson/spotify-app
+      image: omaxanderson/server
+      #build:
+      #   context: .
+      #   dockerfile: Dockerfile
       ports:
          - "5001:5001"
-         - "9000:9000"
       volumes:
          - ./:/app
       secrets:
          - spotify_client_id
          - spotify_client_secret
-   nginx:
-      image: nginx:1.17.2-alpine
-      volumes:
-         - ./spotify.nginx.conf:/usr/share/nginx/nginx.conf
+   client:
+      image: client
+      #image: nginx:1.17.2-alpine
+         #volumes:
+         #- ./spotify.nginx.conf:/usr/share/nginx/nginx.conf
+      ports:
+         - "9001:9000"
 secrets:
    spotify_client_id:
       external: true

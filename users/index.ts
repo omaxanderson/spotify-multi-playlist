@@ -35,7 +35,6 @@ export default async (fastify, opts) => {
 
       const redirect_uri = 'http://localhost:5001/authenticate';
       console.log('about to redirect...');
-      console.log(util.inspect(res));
       const url = 'https://accounts.spotify.com/authorize?'
          + 'response_type=code'
          + `&client_id=${process.env.SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`
