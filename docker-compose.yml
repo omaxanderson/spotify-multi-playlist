@@ -13,12 +13,12 @@ services:
          - spotify_client_id
          - spotify_client_secret
    client:
-      image: client
+      image: omaxanderson/client
       #image: nginx:1.17.2-alpine
          #volumes:
          #- ./spotify.nginx.conf:/usr/share/nginx/nginx.conf
       ports:
-         - "9001:9000"
+         - "9000:9000"
 secrets:
    spotify_client_id:
       external: true
