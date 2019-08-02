@@ -2,9 +2,6 @@ version: "3.7"
 services:
    server:
       image: omaxanderson/server
-      #build:
-      #   context: .
-      #   dockerfile: Dockerfile
       ports:
          - "5001:5001"
       volumes:
@@ -14,9 +11,6 @@ services:
          - spotify_client_secret
    client:
       image: omaxanderson/client
-      #image: nginx:1.17.2-alpine
-         #volumes:
-         #- ./spotify.nginx.conf:/usr/share/nginx/nginx.conf
       ports:
          - "9000:9000"
 secrets:

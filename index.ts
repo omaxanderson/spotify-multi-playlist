@@ -50,6 +50,7 @@ const f = fastify({
 
 f.register(fastifyStatic, {
    root: path.join(__dirname, 'public'),
+   prefix: '/public/',
 });
 
 f.register(fastifyCookie);

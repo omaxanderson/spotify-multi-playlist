@@ -247,22 +247,25 @@ class App extends Component {
                   && this.getToastThing()
             }
 
+            <div className='row'>
             <form className='my-wrapper' onSubmit={this.search}>
-               <div className='search-input input-field'>
+               <div className='search-input input-field col s8 m10'>
                   <input placeholder='Search' type='search' id='search_q' ref={this.searchRef} />
                   <i style={{transform: 'translateY(5px)'}} className='material-icons' onClick={this.clearSearch}>close</i>
                </div>
-               <div className='search-button'>
+               <div className='col s4 m2 search-button right'>
                   <button
                      style={{transform: 'translateY(15px)'}}
                      className='btn'
                      type='submit'
                      onClick={this.search}
                   >
+                     <i className='material-icons right'>search</i>
                      Search
                   </button>
                </div>
             </form>
+            </div>
 
             <div className='row'>
                <form className='col s4' onSubmit={this.onSubmit}>
