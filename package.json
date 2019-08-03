@@ -12,6 +12,8 @@
       "build:client": "npx webpack",
       "build:server": "tsc",
       "server:prod": "node build/index.js",
+      "docker:build-client": "docker build -f Dockerfile-client --tag omaxanderson/client .",
+      "docker:build-server": "docker build -f Dockerfile --tag omaxanderson/server .",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "",

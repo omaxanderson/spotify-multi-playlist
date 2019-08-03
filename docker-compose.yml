@@ -6,6 +6,8 @@ services:
          - "5001:5001"
       volumes:
          - ./:/app
+      environment:
+         - ENV=development
       secrets:
          - spotify_client_id
          - spotify_client_secret

@@ -42,6 +42,10 @@ const f = fastify({
       process.env.SPOTIFY_CLIENT_ID = spotify_client_id.replace(/\n/g, '');
       process.env.SPOTIFY_CLIENT_SECRET = spotify_client_secret.replace(/\n/g, '');
       console.log('set secrets');
+
+      process.env.URL = process.env.ENV === 'development' ? 'localhost' : 'omaxwellanderson.com';
+      process.env.ASSETS_PORT = '9000';
+      process.env.PORT = '5001';
    } catch (e) {
 
    }

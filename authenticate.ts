@@ -7,12 +7,15 @@ export const authenticate = async (req, res) => {
       code,
       state,
    } = req.query;
+
+   const url = `${process.env.URL}:${process.env.PORT}`;
+
    // This flow is used when the spotify service comes back
    if (code) {
       const data = {
          grant_type: 'authorization_code',
          code,
-         redirect_uri: 'http://localhost:5001/authenticate',
+         redirect_uri: `http://${url}/authenticate`,
          client_id: process.env.SPOTIFY_CLIENT_ID,
          client_secret: process.env.SPOTIFY_CLIENT_SECRET,
       };
@@ -61,7 +64,7 @@ export const authenticate = async (req, res) => {
       const data = {
          grant_type: 'refresh_token',
          refresh_token: req.session.refresh_token,
-         redirect_uri: 'http://localhost:5001/authenticate',
+         redirect_uri: `http://${url}/authenticate`,
          client_id: process.env.SPOTIFY_CLIENT_ID,
          client_secret: process.env.SPOTIFY_CLIENT_SECRET,
       };
@@ -110,7 +113,7 @@ export const login = async (req, res) => {
       'user-read-email'
    ].join(' ');
 
-   const redirect_uri = 'http://localhost:5001/authenticate';
+   const redirect_uri = `http://${url}/authenticate`;
    res.redirect('https://accounts.spotify.com/authorize?'
       + 'response_type=code'
       + `&client_id=${process.env.SPOTIFY_CLIENT_ID || 'ughstupiddockersecrets'}`

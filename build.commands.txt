@@ -1,0 +1,6 @@
+docker build -f Dockerfile --tag omaxanderson/server .
+docker build -f Dockerfile-client --tag omaxanderson/client .
+
+docker build -f Dockerfile --tag omaxanderson/server . && docker build -f Dockerfile-client --tag omaxanderson/client .
+
+docker stack deploy --compose-file=docker-compose.yml spotify_stack
