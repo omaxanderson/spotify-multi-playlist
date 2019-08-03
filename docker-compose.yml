@@ -7,7 +7,7 @@ services:
       volumes:
          - ./:/app
       environment:
-         - ENV=development
+         - ENV=production
       secrets:
          - spotify_client_id
          - spotify_client_secret
