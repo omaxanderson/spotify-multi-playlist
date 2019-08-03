@@ -33,7 +33,7 @@ export default async (fastify, opts) => {
          'user-read-email'
       ].join(' ');
 
-      const redirect_uri = `http://${process.env.URL}:${process.env.PORT}/authenticate`;
+      const redirect_uri = `http://${process.env.URL}/authenticate`;
       console.log('about to redirect...');
       const url = 'https://accounts.spotify.com/authorize?'
          + 'response_type=code'
@@ -55,7 +55,7 @@ export default async (fastify, opts) => {
          state,
       } = req.query;
 
-      const url = `${process.env.URL}:${process.env.PORT}`;
+      const url = process.env.URL;
 
       // This flow is used when the spotify service comes back
       if (code) {

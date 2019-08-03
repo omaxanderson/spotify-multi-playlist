@@ -8,7 +8,7 @@ export const authenticate = async (req, res) => {
       state,
    } = req.query;
 
-   const url = `${process.env.URL}:${process.env.PORT}`;
+   const url = process.env.URL;
 
    // This flow is used when the spotify service comes back
    if (code) {

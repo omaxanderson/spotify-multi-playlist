@@ -42,14 +42,17 @@ const f = fastify({
       process.env.SPOTIFY_CLIENT_ID = spotify_client_id.replace(/\n/g, '');
       process.env.SPOTIFY_CLIENT_SECRET = spotify_client_secret.replace(/\n/g, '');
       console.log('set secrets');
-
-      process.env.URL = process.env.ENV === 'development' ? 'localhost' : 'omaxwellanderson.com';
-      process.env.ASSETS_PORT = '9000';
-      process.env.PORT = '5001';
    } catch (e) {
 
    }
+   process.env.URL = process.env.ENV === 'production' ? 'omaxwellanderson.com' : 'localhost:5001';
+   process.env.ASSETS_URL = process.env.ENV === 'production' ? 'omaxwellanderson.com:9000' : 'localhost:9000';
+   process.env.ASSETS_PORT = '9000';
+   process.env.PORT = process.env.ENV === 'production' ? '80' : '5001';
    console.log(process.env.SPOTIFY_CLIENT_ID);
+   console.log(process.env.URL);
+   console.log(process.env.ASSETS_PORT);
+   console.log(process.env.PORT);
 })();
 
 f.register(fastifyStatic, {
@@ -133,7 +136,11 @@ f.get('/', async (req, res) => {
       res.redirect('/login');
       return;
    }
-   res.view('test.pug');
+   res.view('test.pug', {
+      assets_url: `${process.env.URL}:${process.env.ENV === 'production'
+         ? process.env.ASSETS_PORT
+         : process.env.PORT}`,
+   });
 });
 
 

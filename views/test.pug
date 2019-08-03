@@ -2,4 +2,6 @@ extends main.pug
 
 block content
    #App
-   script(type="text/javascript" src='http://0.0.0.0:9000/App.bundle.js')
+   script(type="text/javascript" src='http://' + locals.assets_url + '/App.bundle.js')
+   script(type="text/javascript") window.max = '!{locals.assets_url}';
+   script(type="text/javascript") console.log('assets', '!{locals.assets_url}');
