@@ -1,0 +1,80 @@
+body, html {
+   padding: 0px;
+   margin: 0px;
+}
+
+.selectedToast {
+   position: fixed;
+   bottom: 0px;
+   right: 0px;
+   background-color: #26a69a;
+   color: white;
+   border: 1px solid #DDDDDD;
+   padding: 15px;
+   z-index: 100000;
+}
+
+@media only screen and (max-width: 600px) {
+   .selectedToast {
+      width: 100%;
+   }
+}
+
+@media only screen and (min-width: 600px) {
+   .selectedToast {
+      width: 33%;
+   }
+}
+
+.collapsible-header {
+   margin-top: 0px;
+   margin-bottom: 0px;
+}
+
+.collapsible-body {
+   padding-top: 8px;
+}
+
+/* fun idea, not really worth */
+.hover-test {
+   display: none !important;
+}
+
+.hover-first:hover > .hover-test {
+   display: inline !important;
+}
+
+.trash {
+   cursor: pointer;
+}
+
+.trash:hover {
+   color: #F55B73;
+}
+
+.my-wrapper {
+   display: flex;
+   flex-direction: row;
+}
+
+.search-input {
+   flex: 1;
+   margin-right: 20px;
+}
+
+.search-button {
+   float: right;
+}
+
+.loading-overlay:after {
+  content: " ";
+  z-index: 9999999;
+  display: block;
+  position: absolute;
+  /*height: 100%; */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
