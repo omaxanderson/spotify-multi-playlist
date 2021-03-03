@@ -31,7 +31,7 @@
       "materialize-css": "^1.0.0",
       "pm2": "^3.5.1",
       "point-of-view": "^3.5.0",
-      "pug": "^2.0.3",
+      "pug": "^3.0.1",
       "react": "^16.8.6",
       "react-dom": "^16.8.6",
       "react-redux": "^7.1.0",
